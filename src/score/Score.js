@@ -32,16 +32,6 @@ const Score = props => {
 
 		d3.select(svg)
 			.attr("width", 200 * 1000 + 1000);
-
-		d3.select(svg)
-			.selectAll("rect")
-			.data(props.rects).enter().append("rect")
-			.attr("x", d => d.y)
-			.attr("y", d => 10)
-			.attr("width", 30)
-			.attr("height", 50)
-			.attr("fill", d => d.color)
-			.attr("stroke", d => "#333");
 	}	
 
 	return (

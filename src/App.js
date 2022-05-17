@@ -1,10 +1,10 @@
 import React from 'react';
 import './App.css';
 
-import Keyboard from './keyboard/Keyboard.js'
-import Scroll from './scroll/Scroll.js'
-import Score from './score/Score.js'
-import Tracks from './tracks/Tracks.js'
+import Keyboard from './keyboard/Keyboard.js';
+import Scroll from './scroll/Scroll.js';
+import Score from './score/Score.js';
+import Tracks from './tracks/Tracks.js';
 
 class App extends React.Component {
 	constructor(props) {
