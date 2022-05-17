@@ -44,7 +44,7 @@ class Pitch {
 	 * Returns whether this would be a black key if played on a keyboard. 
 	 */
 	isBlackKey() {
-		return this.getNoteName().indexOf("#") != -1;
+		return this.getNoteName().indexOf("#") !== -1;
 	}
 	
 	/**
@@ -87,7 +87,7 @@ class Pitch {
 	 * Compares this pitch with another. Two pitches are equal if they have the same midi number.
 	 */
 	equals(other) {
-		return (other instanceof Pitch && this.midiNumber == other.midiNumber);
+		return (other instanceof Pitch && this.midiNumber === other.midiNumber);
 	}
 
 	isAbove(pitch) {
