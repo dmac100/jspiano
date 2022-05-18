@@ -53,7 +53,6 @@ class App extends React.Component {
 	}
 
 	onPositionChanged(position) {
-		console.log(position);
 		this.setState(prevState => ({
 			position: position,
 			playingNotes: getPlayingNotes(prevState.musicXml, position)

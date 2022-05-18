@@ -94,6 +94,18 @@ const Keyboard = (props) => {
 				.attr("height", keyHeight)
 				.attr("fill", (selected == null) ? white : selected)
 				.attr("stroke", black);
+
+			if(selected) {
+				d3.select(svg)
+					.append("rect")
+					.attr("x", leftMargin + keyWidth * x + 1)
+					.attr("y", topMargin)
+					.attr("width", keyWidth)
+					.attr("height", keyHeight - 1)
+					.attr("fill", "none")
+					.attr("stroke", black);
+
+			}
 			
 			// Get the pitch of the next white key.
 			pitch = pitch.nextSemitone();
@@ -138,6 +150,15 @@ const Keyboard = (props) => {
 					.attr("height", 5)
 					.attr("fill", grey50)
 					.attr("stroke", grey80);
+			} else {
+				d3.select(svg)
+					.append("rect")
+					.attr("x", left + 1)
+					.attr("y", topMargin)
+					.attr("width", width - 2)
+					.attr("height", blackKeyHeight - 1)
+					.attr("fill", "none")
+					.attr("stroke", black);
 			}
 			
 			// Get the pitch of the next black key.
