@@ -1,8 +1,7 @@
 import React from 'react';
-import raw from "raw.macro";
 import * as d3 from 'd3';
 import './Scroll.css';
-import MusicXmlParser from '../parser/musicXmlParser.js';
+import getNoteColor from '../model/colors.js';
 
 function usePrevious(value) {
 	const ref = React.useRef();
@@ -15,8 +14,6 @@ function usePrevious(value) {
 const keyWidth = 12;
 const leftMargin = 10;
 const scale = 1;
-
-const musicXml = MusicXmlParser.parse(raw("../testfiles/Chopin - Nocturne 9-2.xml"));
 
 function getNoteTop(totalHeight, note) {
 	const startTime = note.startTime / scale;
@@ -39,40 +36,23 @@ function getPosition(pitch) {
 	return position;
 }
 
-function getNoteColor(note) {
-	const track = note.part.index % trackColors.length;
-	return note.pitch.isBlackKey() ? trackColors[track].darker() : trackColors[track];
-}
-
-const trackColors = [
-	d3.rgb(220, 220, 80),
-	d3.rgb(80, 220, 220),
-	d3.rgb(220, 80, 220),
-	d3.rgb(220, 80, 80),
-	d3.rgb(80, 220, 80),
-	d3.rgb(80, 80, 220),
-	d3.rgb(250, 180, 0),
-	d3.rgb(170, 210, 200),
-	d3.rgb(230, 220, 120),
-	d3.rgb(255, 240, 80),
-	d3.rgb(220, 200, 230)
-];
-
 const Scroll = props => {
 	const scrollRef = React.createRef();
 	const svgRef = React.createRef();
 
 	const prevProps = usePrevious(props);
 
+	const totalHeight = props.musicXml ? props.musicXml.notes.reduce((max, note) => Math.max(max, note.startTime + note.duration), 0) : 2000;
+
 	React.useEffect(() => {
-		scrollRef.current.scrollTop = props.position;
-		if(!prevProps || props.rects !== prevProps.rects) {
+		scrollRef.current.scrollTop = totalHeight - props.position;
+		if(!prevProps || props.musicXml !== prevProps.musicXml) {
 			renderSvg();
 		}
 	});
 
 	function onScroll() {
-		props.onScroll(scrollRef.current.scrollTop);
+		props.onScroll(totalHeight - scrollRef.current.scrollTop);
 	}
 
 	function renderSvg() {
@@ -86,8 +66,7 @@ const Scroll = props => {
 		const grey240 = 'rgb(240,240,240)';
 
 		const clientWidth = keyWidth * 104;
-
-		const totalHeight = musicXml.notes.reduce((max, note) => Math.max(max, note.startTime + note.duration), 0);
+		const clientHeight = scrollRef.current.clientHeight
 
 		d3.select(svg)
 			.attr("width", clientWidth)
@@ -108,40 +87,42 @@ const Scroll = props => {
 			}
 		}
 
-		// Draw the barlines.
-		musicXml.measures.forEach(measure => {
-			const measureStartY = totalHeight - (measure.startTime / scale);
-			const measureEndY = totalHeight - (measure.endTime / scale);
+		if(props.musicXml) {
+			// Draw the barlines.
+			props.musicXml.measures.forEach(measure => {
+				const measureStartY = totalHeight - (measure.startTime / scale);
+				const measureEndY = totalHeight - (measure.endTime / scale);
 
-			for(let i = 0; i < measure.beats; i++) {
-				const measureY = measureStartY + (measureEndY - measureStartY) * (i / measure.beats);
+				for(let i = 0; i < measure.beats; i++) {
+					const measureY = measureStartY + (measureEndY - measureStartY) * (i / measure.beats) + clientHeight;
+
+					d3.select(svg)
+						.append("line")
+						.attr("x1", leftMargin)
+						.attr("y1", measureY)
+						.attr("x2", leftMargin + clientWidth)
+						.attr("y2", measureY)
+						.attr("stroke", (i === 0) ? black : grey220)
+				}
+			});
+
+			// Draw the note markers.
+			props.musicXml.notes.forEach(note => {
+				const pitch = note.pitch.getMidiNumber();
+				const duration = note.duration / scale;
+
+				const y = getNoteTop(totalHeight, note) + clientHeight;
 
 				d3.select(svg)
-					.append("line")
-					.attr("x1", leftMargin)
-					.attr("y1", measureY)
-					.attr("x2", leftMargin + clientWidth)
-					.attr("y2", measureY)
-					.attr("stroke", (i === 0) ? black : grey220)
-			}
-		});
-
-		// Draw the note markers.
-		musicXml.notes.forEach(note => {
-			const pitch = note.pitch.getMidiNumber();
-			const duration = note.duration / scale;
-
-			const y = getNoteTop(totalHeight, note);
-
-			d3.select(svg)
-				.append("rect")
-				.attr("x", leftMargin + getPosition(pitch) - 1)
-				.attr("y", y)
-				.attr("width", keyWidth * 0.9)
-				.attr("height", duration)
-				.attr("stroke", black)
-				.attr("fill", getNoteColor(note));
-		});
+					.append("rect")
+					.attr("x", leftMargin + getPosition(pitch) - 1)
+					.attr("y", y)
+					.attr("width", keyWidth * 0.9)
+					.attr("height", duration)
+					.attr("stroke", black)
+					.attr("fill", getNoteColor(note));
+			});
+		}
 	}	
 
 	return (

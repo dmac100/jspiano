@@ -1,5 +1,6 @@
 import React from 'react';
 import Pitch from '../model/pitch.js'
+import getNoteColor from '../model/colors.js';
 import * as d3 from 'd3';
 import './Keyboard.css';
 
@@ -19,6 +20,11 @@ const Keyboard = (props) => {
 	React.useEffect(() => renderSvg());
 
 	function getSelectedColor(pitch) {
+		for(var note of props.playingNotes) {
+			if(note.pitch.equals(pitch)) {
+				return getNoteColor(note);
+			}
+		}
 		return null;
 	}
 

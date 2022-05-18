@@ -1,10 +1,27 @@
 import React from 'react';
 import './App.css';
 
+import raw from "raw.macro";
+import Pitch from './model/pitch.js';
 import Keyboard from './keyboard/Keyboard.js';
 import Scroll from './scroll/Scroll.js';
 import Score from './score/Score.js';
 import Tracks from './tracks/Tracks.js';
+import MusicXmlParser from './parser/musicXmlParser.js';
+
+const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
+
+function getPlayingNotes(musicXml, position) {
+	const playingNotes = [];
+
+	musicXml.notes.forEach(note => {
+		if(note.startTime <= position && note.startTime + note.duration > position) {
+			playingNotes.push(note);
+		}
+	});
+
+	return playingNotes;
+}
 
 class App extends React.Component {
 	constructor(props) {
@@ -12,8 +29,9 @@ class App extends React.Component {
 
 		this.state = {
 			position: 0,
-			rects: this.loadRects(),
-			tracks: this.createTracks()
+			tracks: this.createTracks(),
+			musicXml: musicXml,
+			playingNotes: []
 		}
 
 		this.onPositionChanged = this.onPositionChanged.bind(this);
@@ -28,18 +46,6 @@ class App extends React.Component {
 		];
 	}
 
-	loadRects() {
-		const rects = [];
-
-		for(let i = 0; i < 200; i++) {
-			rects.push({x: 60, y: 50 + i * 1000, color: '#ccaaaa'});
-			rects.push({x: 300, y: 300 + i * 1000, color: '#ccccaa'});
-			rects.push({x: 700, y: 700 + i * 1000, color: '#ccaacc'});
-		}
-
-		return rects;
-	}
-
 	onTrackChange(track) {
 		this.setState(prevState => ({
 			tracks: prevState.tracks.map(t => (t.id === track.id) ? track : t)
@@ -47,9 +53,11 @@ class App extends React.Component {
 	}
 
 	onPositionChanged(position) {
-		this.setState({
-			position: position
-		});
+		console.log(position);
+		this.setState(prevState => ({
+			position: position,
+			playingNotes: getPlayingNotes(prevState.musicXml, position)
+		}));
 	}
 
 	render() {
@@ -57,9 +65,9 @@ class App extends React.Component {
 			<div className="App">
 				<header className="App-header">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
-					<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} rects={this.state.rects}/>
-					<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} rects={this.state.rects}/>
-					<Keyboard/>
+					<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
+					<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
+					<Keyboard playingNotes={this.state.playingNotes}/>
 				</header>
 			</div>
 		);
