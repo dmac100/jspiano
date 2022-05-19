@@ -37,6 +37,7 @@ class App extends React.Component {
 		this.onPositionChanged = this.onPositionChanged.bind(this);
 		this.createTracks = this.createTracks.bind(this);
 		this.onTrackChange = this.onTrackChange.bind(this);
+		this.onKeyClicked = this.onKeyClicked.bind(this);
 	}
 
 	createTracks() {
@@ -44,6 +45,10 @@ class App extends React.Component {
 			{ id: 1, name: "Right", active: true },
 			{ id: 2, name: "Left", active: false }
 		];
+	}
+
+	onKeyClicked(pitch) {
+		console.log("CLICKED: ", pitch);
 	}
 
 	onTrackChange(track) {
@@ -66,7 +71,7 @@ class App extends React.Component {
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
 					<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
 					<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
-					<Keyboard playingNotes={this.state.playingNotes}/>
+					<Keyboard playingNotes={this.state.playingNotes} onClick={this.onKeyClicked}/>
 				</header>
 			</div>
 		);

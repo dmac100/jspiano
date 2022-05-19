@@ -14,10 +14,19 @@ const blackMargin = 5;
 const borderWidth = 9;
 const nWhiteKeys = 52;
 
+function inRect(x, y, rect) {
+	if(x < rect.x || x > rect.x + rect.width) return false;
+	if(y < rect.y || y > rect.y + rect.height) return false;
+	return true;
+}
+
 const Keyboard = (props) => {
 	const svgRef = React.useRef();
 
 	React.useEffect(() => renderSvg());
+
+	const blackKey = [];
+	const whiteKeys = [];
 
 	function getSelectedColor(pitch) {
 		for(var note of props.playingNotes) {
@@ -26,6 +35,87 @@ const Keyboard = (props) => {
 			}
 		}
 		return null;
+	}
+
+	function getBlackKeys() {
+		const keys = [];
+
+		let pitch = new Pitch("a#0");
+
+		// Draw every black key.
+		for(let x = 0; x < nWhiteKeys - 1; x++) {
+			// Skip a black key between B/C and E/F.
+			if(x % 7 === 1 || x % 7 === 4) {
+				pitch = pitch.nextSemitone();
+				continue;
+			}
+			
+			const left = leftMargin + keyWidth * x + keyWidth / 2 + blackMargin;
+			const width = keyWidth - blackMargin * 2 + 1;
+
+			keys.push({
+				pitch,
+				x: left,
+				y: topMargin,
+				width: width,
+				height: blackKeyHeight
+			});
+
+			// Get the pitch of the next black key.
+			pitch = pitch.nextSemitone();
+			pitch = pitch.nextSemitone();
+		}
+
+		return keys;
+	}
+
+	function getWhiteKeys() {
+		const keys = [];
+
+		let pitch = new Pitch("a0");
+
+		// Draw every white key.
+		for(let x = 0; x < nWhiteKeys; x++) {
+			const selected = getSelectedColor(pitch);
+
+			keys.push({
+				pitch,
+				x: leftMargin + keyWidth * x,
+				y: topMargin,
+				width: keyWidth,
+				height: keyHeight
+			})
+
+			// Get the pitch of the next white key.
+			pitch = pitch.nextSemitone();
+			// Add an extra semitone except between B/C and E/F.
+			if(x % 7 !== 1 && x % 7 !== 4) {
+				pitch = pitch.nextSemitone();
+			}
+		}
+
+		return keys;
+	}
+
+	function onClick(event) {
+		const svg = svgRef.current;
+
+		const clickX = event.clientX - svg.getBoundingClientRect().x;
+		const clickY = event.clientY - svg.getBoundingClientRect().y;
+
+		for(const key of getBlackKeys()) {
+			if(inRect(clickX, clickY, key)) {
+				props.onClick(key.pitch);
+				return;
+			}
+		}
+
+		for(const key of getWhiteKeys()) {
+			if(inRect(clickX, clickY, key)) {
+				props.onClick(key.pitch);
+				return;
+			}
+		}
 	}
 
 	function renderSvg() {
@@ -43,8 +133,6 @@ const Keyboard = (props) => {
 		const grey50 = 'rgb(50,50,50)';
 		const grey80 = 'rgb(80,80,80)';
 		const grey120 = 'rgb(120,120,120)';
-
-		let pitch = new Pitch("a0");
 
 		// Draw the border of the keyboard.
 		d3.select(svg)
@@ -82,61 +170,43 @@ const Keyboard = (props) => {
 			.attr("fill", 'url(#gradient)');
 
 		// Draw every white key.
-		for(let x = 0; x < nWhiteKeys; x++) {
-			const selected = getSelectedColor(pitch);
+		getWhiteKeys().forEach(key => {
+			const selected = getSelectedColor(key.pitch);
 
 			// Draw rectangle for the key.
 			d3.select(svg)
 				.append("rect")
-				.attr("x", leftMargin + keyWidth * x)
-				.attr("y", topMargin)
-				.attr("width", keyWidth)
-				.attr("height", keyHeight)
+				.attr("x", key.x)
+				.attr("y", key.y)
+				.attr("width", key.width)
+				.attr("height", key.height)
 				.attr("fill", (selected == null) ? white : selected)
 				.attr("stroke", black);
 
 			if(selected) {
 				d3.select(svg)
 					.append("rect")
-					.attr("x", leftMargin + keyWidth * x + 1)
-					.attr("y", topMargin)
-					.attr("width", keyWidth)
-					.attr("height", keyHeight - 1)
+					.attr("x", key.x + 1)
+					.attr("y", key.y)
+					.attr("width", key.width)
+					.attr("height", key.height - 1)
 					.attr("fill", "none")
 					.attr("stroke", black);
 
 			}
-			
-			// Get the pitch of the next white key.
-			pitch = pitch.nextSemitone();
-			// Add an extra semitone except between B/C and E/F.
-			if(x % 7 !== 1 && x % 7 !== 4) {
-				pitch = pitch.nextSemitone();
-			}
-		}
-
-		pitch = new Pitch("a#0");
+		})
 
 		// Draw every black key.
-		for(let x = 0; x < nWhiteKeys - 1; x++) {
-			// Skip a black key between B/C and E/F.
-			if(x % 7 === 1 || x % 7 === 4) {
-				pitch = pitch.nextSemitone();
-				continue;
-			}
-			
-			const selected = getSelectedColor(pitch);
-			
-			const left = leftMargin + keyWidth * x + keyWidth / 2 + blackMargin;
-			const width = keyWidth - blackMargin * 2 + 1;
+		getBlackKeys().forEach(key => {
+			const selected = getSelectedColor(key.pitch);
 			
 			// Draw rectangle for the key.
 			d3.select(svg)
 				.append("rect")
-				.attr("x", left)
-				.attr("y", topMargin)
-				.attr("width", width)
-				.attr("height", blackKeyHeight)
+				.attr("x", key.x)
+				.attr("y", key.y)
+				.attr("width", key.width)
+				.attr("height", key.height)
 				.attr("fill", (selected == null) ? black : selected)
 				.attr("stroke", black);
 
@@ -144,31 +214,27 @@ const Keyboard = (props) => {
 				// Add a lower highlight to the key.
 				d3.select(svg)
 					.append("rect")
-					.attr("x", left + 1)
-					.attr("y", topMargin + blackKeyHeight - 5)
-					.attr("width", width - 1)
+					.attr("x", key.x + 1)
+					.attr("y", key.y + blackKeyHeight - 5)
+					.attr("width", key.width - 1)
 					.attr("height", 5)
-					.attr("fill", grey50)
+					.attr("fill", grey30)
 					.attr("stroke", grey80);
 			} else {
 				d3.select(svg)
 					.append("rect")
-					.attr("x", left + 1)
-					.attr("y", topMargin)
-					.attr("width", width - 2)
-					.attr("height", blackKeyHeight - 1)
+					.attr("x", key.x + 1)
+					.attr("y", key.y)
+					.attr("width", key.width - 2)
+					.attr("height", key.height - 1)
 					.attr("fill", "none")
 					.attr("stroke", black);
 			}
-			
-			// Get the pitch of the next black key.
-			pitch = pitch.nextSemitone();
-			pitch = pitch.nextSemitone();
-		}
+		});
 	}
 
 	return (
-		<svg className="keyboardSvg" ref={svgRef}>
+		<svg className="keyboardSvg" ref={svgRef} onClick={event => onClick(event)}>
 		</svg>
 	);
 };
