@@ -36,6 +36,12 @@ function getPosition(pitch) {
 	return position;
 }
 
+function getActiveTracks(tracks) {
+	const activeTracks = new Set();
+	tracks.filter(track => track.active).forEach(track => activeTracks.add(track.id));
+	return activeTracks;
+}
+
 const Scroll = props => {
 	const scrollRef = React.createRef();
 	const svgRef = React.createRef();
@@ -46,7 +52,7 @@ const Scroll = props => {
 
 	React.useEffect(() => {
 		scrollRef.current.scrollTop = totalHeight - (props.position + scrollRef.current.clientHeight);
-		if(!prevProps || props.musicXml !== prevProps.musicXml) {
+		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks != prevProps.tracks) {
 			renderSvg();
 		}
 	});
@@ -105,21 +111,25 @@ const Scroll = props => {
 				}
 			});
 
+			const activeTracks = getActiveTracks(props.tracks);
+
 			// Draw the note markers.
 			props.musicXml.notes.forEach(note => {
-				const pitch = note.pitch.getMidiNumber();
-				const duration = note.duration / scale;
+				if(activeTracks.has(note.part.partId)) {
+					const pitch = note.pitch.getMidiNumber();
+					const duration = note.duration / scale;
 
-				const y = getNoteTop(totalHeight, note);
+					const y = getNoteTop(totalHeight, note);
 
-				d3.select(svg)
-					.append("rect")
-					.attr("x", leftMargin + getPosition(pitch) - 1)
-					.attr("y", y)
-					.attr("width", keyWidth * 0.9)
-					.attr("height", duration)
-					.attr("stroke", black)
-					.attr("fill", getNoteColor(note));
+					d3.select(svg)
+						.append("rect")
+						.attr("x", leftMargin + getPosition(pitch) - 1)
+						.attr("y", y)
+						.attr("width", keyWidth * 0.9)
+						.attr("height", duration)
+						.attr("stroke", black)
+						.attr("fill", getNoteColor(note));
+				}
 			});
 		}
 	}	

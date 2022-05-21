@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
+import raw from 'raw.macro';
+import _ from 'underscore';
 
-import raw from "raw.macro";
 import Pitch from './model/pitch.js';
 import Keyboard from './keyboard/Keyboard.js';
 import Scroll from './scroll/Scroll.js';
@@ -49,7 +50,12 @@ class PlayTimer {
 	setAdvanceCallback(callback) {
 		this.advanceCallback = callback;
 	}
+}
 
+function getActiveTracks(tracks) {
+	const activeTracks = new Set();
+	tracks.filter(track => track.active).forEach(track => activeTracks.add(track.id));
+	return activeTracks;
 }
 
 class App extends React.Component {
@@ -58,7 +64,7 @@ class App extends React.Component {
 
 		this.state = {
 			position: 0,
-			tracks: this.createTracks(),
+			tracks: this.createTracks(musicXml),
 			musicXml: musicXml,
 			playingNotes: [],
 			playing: false
@@ -88,11 +94,17 @@ class App extends React.Component {
 		}));
 	}
 
-	createTracks() {
-		return [
-			{ id: 1, name: "Right", active: true },
-			{ id: 2, name: "Left", active: false }
-		];
+	createTracks(musicXml) {
+		let parts = musicXml.notes.map(note => note.part);
+		parts = _.uniq(parts, false, part => part.partId);
+		parts = _.sortBy(parts, part => part.partId);
+
+		return parts.map(part => ({
+			id: part.partId,
+			name: part.partName,
+			active: true,
+			wait: false
+		}));
 	}
 
 	onKeyClicked(pitch) {
@@ -125,6 +137,7 @@ class App extends React.Component {
 	onKeyDown(event) {
 		if(!this.state.musicXml) return;
 
+		const SPACE = 32;
 		const PAGE_UP = 33;
 		const PAGE_DOWN = 34;
 		const HOME = 36;
@@ -134,20 +147,28 @@ class App extends React.Component {
 		const ARROW_RIGHT = 39;
 		const ARROW_DOWN = 40;
 
+		if(event.keyCode == SPACE) {
+			this.togglePlay();
+		}
+
+		const activeTracks = getActiveTracks(this.state.tracks);
+
 		// Move to previous or next note on arrow up and down.
 		if(event.keyCode == ARROW_UP || event.keyCode == ARROW_DOWN) {
 			let position = null;
 			for(let note of this.state.musicXml.notes) {
-				if(event.keyCode == ARROW_UP) {
-					if(note.startTime > this.state.position) {
-						if(!position || note.startTime < position) {
-							position = note.startTime;
+				if(activeTracks.has(note.part.partId)) {
+					if(event.keyCode == ARROW_UP) {
+						if(note.startTime > this.state.position) {
+							if(!position || note.startTime < position) {
+								position = note.startTime;
+							}
 						}
-					}
-				} else if(event.keyCode == ARROW_DOWN) {
-					if(note.startTime < this.state.position) {
-						if(!position || note.startTime > position) {
-							position = note.startTime;
+					} else if(event.keyCode == ARROW_DOWN) {
+						if(note.startTime < this.state.position) {
+							if(!position || note.startTime > position) {
+								position = note.startTime;
+							}
 						}
 					}
 				}
@@ -227,7 +248,7 @@ class App extends React.Component {
 				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
 
 				<div className="bottomContent">
-					<Keyboard playingNotes={this.state.playingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
+					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
 					<Controls onPlay={this.togglePlay} playing={this.state.playing}/>
 				</div>
 			</div>

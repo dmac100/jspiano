@@ -20,6 +20,12 @@ function inRect(x, y, rect) {
 	return true;
 }
 
+function getActiveTracks(tracks) {
+	const activeTracks = new Set();
+	tracks.filter(track => track.active).forEach(track => activeTracks.add(track.id));
+	return activeTracks;
+}
+
 const Keyboard = (props) => {
 	const svgRef = React.useRef();
 
@@ -28,9 +34,9 @@ const Keyboard = (props) => {
 	const blackKey = [];
 	const whiteKeys = [];
 
-	function getSelectedColor(pitch) {
+	function getSelectedColor(pitch, activeTracks) {
 		for(var note of props.playingNotes) {
-			if(note.pitch.equals(pitch)) {
+			if(note.pitch.equals(pitch) && activeTracks.has(note.part.partId)) {
 				return getNoteColor(note);
 			}
 		}
@@ -76,8 +82,6 @@ const Keyboard = (props) => {
 
 		// Draw every white key.
 		for(let x = 0; x < nWhiteKeys; x++) {
-			const selected = getSelectedColor(pitch);
-
 			keys.push({
 				pitch,
 				x: leftMargin + keyWidth * x,
@@ -134,6 +138,8 @@ const Keyboard = (props) => {
 		const grey80 = 'rgb(80,80,80)';
 		const grey120 = 'rgb(120,120,120)';
 
+		const activeTracks = getActiveTracks(props.tracks);
+
 		// Draw the border of the keyboard.
 		d3.select(svg)
 			.append("rect")
@@ -171,7 +177,7 @@ const Keyboard = (props) => {
 
 		// Draw every white key.
 		getWhiteKeys().forEach(key => {
-			const selected = getSelectedColor(key.pitch);
+			const selected = getSelectedColor(key.pitch, activeTracks);
 
 			// Draw rectangle for the key.
 			d3.select(svg)
@@ -198,8 +204,8 @@ const Keyboard = (props) => {
 
 		// Draw every black key.
 		getBlackKeys().forEach(key => {
-			const selected = getSelectedColor(key.pitch);
-			
+			const selected = getSelectedColor(key.pitch, activeTracks);
+
 			// Draw rectangle for the key.
 			d3.select(svg)
 				.append("rect")

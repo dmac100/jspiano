@@ -9,10 +9,19 @@ const Track = (props) => {
 		});
 	}
 
+	function onWaitChange() {
+		props.onChange({
+			...props.track,
+			wait: !props.track.wait
+		});
+	}
+
 	return (
 		<div className="track">
 			<b>{props.track.name} </b>
-			<label>Active: </label><input type="checkbox" checked={props.track.active} onChange={onActiveChange}/>
+			<b>({props.track.id}) </b>
+			<label> Active: </label><input type="checkbox" checked={props.track.active} onChange={onActiveChange}/>
+			<label> Wait: </label><input type="checkbox" checked={props.track.wait} onChange={onWaitChange}/>
 		</div>
 	);
 };
