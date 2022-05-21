@@ -93,7 +93,9 @@ class MusicXmlParser {
 			});
 		});
 
-		return { notes, measures };
+		const length = notes.reduce((max, note) => Math.max(max, note.startTime + note.duration), 0)
+
+		return { notes, measures, length };
 	}
 }
 

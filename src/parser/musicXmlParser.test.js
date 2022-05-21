@@ -30,4 +30,6 @@ test('gets measures and notes', () => {
 		},
 		startTime: 25560
 	});
+
+	expect(parsed.length).toBe(25920);
 });

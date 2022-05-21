@@ -4,8 +4,12 @@
 
 	margin: 10px;
 	width: 1270px;
-	height: 600px;
+	height: 200px;
 	border: 1px solid #ccc;
+	flex-grow: 1;
+
+	background-color: #fff;
+	align-self: center;
 }
 
 .svg {

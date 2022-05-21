@@ -1,0 +1,23 @@
+.App {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	bottom: 0px;
+	right: 0px;
+	display: flex;
+	flex-direction: column;
+	background-color: #ccc;
+}
+
+.topContent {
+	background-color: #fff;
+	border-bottom: 1px solid #999;
+	box-shadow: 0px 1px 5px #aaa;
+}
+
+.bottomContent {
+	background-color: #fff;
+	border-top: 1px solid #999;
+	text-align: center;
+	box-shadow: 0px -2px 5px #aaa;
+}

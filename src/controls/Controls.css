@@ -1,0 +1,9 @@
+.controls {
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+.controls .button {
+	padding: 5px 50px 5px;
+	font-weight: bold;
+}
