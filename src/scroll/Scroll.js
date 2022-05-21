@@ -52,7 +52,7 @@ const Scroll = props => {
 
 	React.useEffect(() => {
 		scrollRef.current.scrollTop = totalHeight - (props.position + scrollRef.current.clientHeight);
-		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks != prevProps.tracks) {
+		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks !== prevProps.tracks) {
 			renderSvg();
 		}
 	});

@@ -147,24 +147,24 @@ class App extends React.Component {
 		const ARROW_RIGHT = 39;
 		const ARROW_DOWN = 40;
 
-		if(event.keyCode == SPACE) {
+		if(event.keyCode === SPACE) {
 			this.togglePlay();
 		}
 
 		const activeTracks = getActiveTracks(this.state.tracks);
 
 		// Move to previous or next note on arrow up and down.
-		if(event.keyCode == ARROW_UP || event.keyCode == ARROW_DOWN) {
+		if(event.keyCode === ARROW_UP || event.keyCode === ARROW_DOWN) {
 			let position = null;
 			for(let note of this.state.musicXml.notes) {
 				if(activeTracks.has(note.part.partId)) {
-					if(event.keyCode == ARROW_UP) {
+					if(event.keyCode === ARROW_UP) {
 						if(note.startTime > this.state.position) {
 							if(!position || note.startTime < position) {
 								position = note.startTime;
 							}
 						}
-					} else if(event.keyCode == ARROW_DOWN) {
+					} else if(event.keyCode === ARROW_DOWN) {
 						if(note.startTime < this.state.position) {
 							if(!position || note.startTime > position) {
 								position = note.startTime;
@@ -180,16 +180,16 @@ class App extends React.Component {
 		}
 
 		// Move to previous or next measure on arrow left and right.
-		if(event.keyCode == ARROW_LEFT || event.keyCode == ARROW_RIGHT) {
+		if(event.keyCode === ARROW_LEFT || event.keyCode === ARROW_RIGHT) {
 			let position = null;
 			for(let measure of this.state.musicXml.measures) {
-				if(event.keyCode == ARROW_LEFT) {
+				if(event.keyCode === ARROW_LEFT) {
 					if(measure.startTime < this.state.position) {
 						if(!position || measure.startTime > position) {
 							position = measure.startTime;
 						}
 					}
-				} else if(event.keyCode == ARROW_RIGHT) {
+				} else if(event.keyCode === ARROW_RIGHT) {
 					if(measure.startTime > this.state.position) {
 						if(!position || measure.startTime < position) {
 							position = measure.startTime;
@@ -204,16 +204,16 @@ class App extends React.Component {
 		}
 
 		// Move to beginning or end on home and end.
-		if(event.keyCode == HOME) {
+		if(event.keyCode === HOME) {
 			this.setPositionSmooth(0);
-		} else if(event.keyCode == END) {
+		} else if(event.keyCode === END) {
 			this.setPositionSmooth(musicXml.length);
 		}
 
 		// Jump back or forward on page up and down.
-		if(event.keyCode == PAGE_UP) {
+		if(event.keyCode === PAGE_UP) {
 			this.setPositionSmooth(this.state.position - this.state.musicXml.length / 20);
-		} else if(event.keyCode == PAGE_DOWN) {
+		} else if(event.keyCode === PAGE_DOWN) {
 			this.setPositionSmooth(this.state.position + this.state.musicXml.length / 20);
 		}
 	}
