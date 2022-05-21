@@ -10,6 +10,7 @@ import Score from './score/Score.js';
 import Tracks from './tracks/Tracks.js';
 import Controls from './controls/Controls.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
+import Sliders from './sliders/Sliders.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
@@ -67,7 +68,9 @@ class App extends React.Component {
 			tracks: this.createTracks(musicXml),
 			musicXml: musicXml,
 			playingNotes: [],
-			playing: false
+			playing: false,
+			tempo: 50,
+			scale: 50
 		};
 
 		this.onPositionChanged = this.onPositionChanged.bind(this);
@@ -78,6 +81,8 @@ class App extends React.Component {
 		this.advance = this.advance.bind(this);
 		this.onKeyDown = this.onKeyDown.bind(this);
 		this.setPositionSmooth = this.setPositionSmooth.bind(this);
+		this.onTempoChange = this.onTempoChange.bind(this);
+		this.onScaleChange = this.onScaleChange.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
@@ -88,9 +93,11 @@ class App extends React.Component {
 			this.playTimer.stopTimer();
 		}
 
+		const tempo = this.state.tempo / 50;
+
 		this.setState(prevState => ({
-			position: prevState.position + amount,
-			playing: (prevState.position + amount >= prevState.musicXml.length) ? false : prevState.playing
+			position: prevState.position + (amount * tempo),
+			playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
 		}));
 	}
 
@@ -237,15 +244,24 @@ class App extends React.Component {
 		const timer = setInterval(scroll.bind(this), 5);
 	}
 
+	onTempoChange(value) {
+		this.setState({ tempo: value });
+	}
+
+	onScaleChange(value) {
+		this.setState({ scale: value });
+	}
+
 	render() {
 		return (
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
+					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange}/>
 				</div>
 				{/*<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>*/}
 
-				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
+				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>
 
 				<div className="bottomContent">
 					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>

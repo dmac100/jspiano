@@ -1,0 +1,46 @@
+.sliders {
+	margin: 10px;
+}
+
+.sliderGroup {
+	display: flex;
+	align-items: center;
+}
+
+.sliderGroup label {
+	min-width: 60px;
+}
+
+.slider {
+	width: 200px;
+	height: 20px;
+	margin: 5px 10px;
+	display: inline-block;
+}
+
+.sliderThumb {
+	cursor: pointer;
+	position: absolute;
+	z-index: 100;
+	background: #ffffff;
+	border: 3px solid #3774ff;
+	border-radius: 100%;
+	display: block;
+}
+
+.sliderTrack {
+	position: relative;
+	background: #ddd;
+}
+
+.slider .sliderTrack {
+	top: 10px;
+	height: 4px;
+}
+
+.slider .sliderThumb {
+	top: 4px;
+	width: 10px;
+	outline: none;
+	height: 10px;
+}
