@@ -21,9 +21,7 @@ function inRect(x, y, rect) {
 }
 
 function getActiveTracks(tracks) {
-	const activeTracks = new Set();
-	tracks.filter(track => track.active).forEach(track => activeTracks.add(track.id));
-	return activeTracks;
+	return new Set(tracks.filter(track => track.active).map(track => track.id));
 }
 
 const Keyboard = (props) => {
@@ -35,11 +33,18 @@ const Keyboard = (props) => {
 	const whiteKeys = [];
 
 	function getSelectedColor(pitch, activeTracks) {
+		for(var note of props.waitingNotes) {
+			if(note.pitch.equals(pitch)) {
+				return '#e33';
+			}
+		}
+
 		for(var note of props.playingNotes) {
 			if(note.pitch.equals(pitch) && activeTracks.has(note.part.partId)) {
 				return getNoteColor(note);
 			}
 		}
+
 		return null;
 	}
 

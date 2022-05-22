@@ -14,16 +14,26 @@ import Sliders from './sliders/Sliders.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
-function getPlayingNotes(musicXml, position) {
-	const playingNotes = [];
+function getPlayingNotes(musicXml, tracks, position) {
+	const activeTracks = new Set(tracks.filter(track => track.active).map(track => track.id));
 
-	musicXml.notes.forEach(note => {
-		if(note.startTime <= position && note.startTime + note.duration > position) {
-			playingNotes.push(note);
-		}
+	return musicXml.notes.filter(note => {
+		if(!activeTracks.has(note.part.partId)) return false;
+
+		return (note.startTime <= position && note.startTime + note.duration > position);
+	});
+}
+
+function getWaitingNotes(musicXml, tracks, prevPosition, position) {
+	const waitingTracks = new Set(tracks.filter(track => track.wait).map(track => track.id));
+
+	const waitingNotes = musicXml.notes.filter(note => {
+		if(!waitingTracks.has(note.part.partId)) return false;
+
+		return (note.startTime > prevPosition && note.startTime <= position);
 	});
 
-	return playingNotes;
+	return _.uniq(waitingNotes, false, note => note.pitch.getMidiNumber());
 }
 
 class PlayTimer {
@@ -54,9 +64,7 @@ class PlayTimer {
 }
 
 function getActiveTracks(tracks) {
-	const activeTracks = new Set();
-	tracks.filter(track => track.active).forEach(track => activeTracks.add(track.id));
-	return activeTracks;
+	return new Set(tracks.filter(track => track.active).map(track => track.id));
 }
 
 class App extends React.Component {
@@ -68,6 +76,7 @@ class App extends React.Component {
 			tracks: this.createTracks(musicXml),
 			musicXml: musicXml,
 			playingNotes: [],
+			waitingNotes: [],
 			playing: false,
 			tempo: 20,
 			scale: 20
@@ -95,10 +104,13 @@ class App extends React.Component {
 
 		const tempo = this.state.tempo / 50;
 
-		this.setState(prevState => ({
-			position: prevState.position + (amount * tempo),
-			playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
-		}));
+		if(this.state.waitingNotes.length == 0) {
+			this.setState(prevState => ({
+				position: Math.round(prevState.position + (amount * tempo)),
+				waitingNotes: getWaitingNotes(prevState.musicXml, prevState.tracks, prevState.position, prevState.position + (amount * tempo)),
+				playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
+			}));
+		}
 	}
 
 	createTracks(musicXml) {
@@ -115,7 +127,9 @@ class App extends React.Component {
 	}
 
 	onKeyClicked(pitch) {
-		console.log("CLICKED: ", pitch);
+		this.setState(prevState => ({
+			waitingNotes: prevState.waitingNotes.filter(note => !note.pitch.equals(pitch))
+		}));
 	}
 
 	onTrackChange(track) {
@@ -126,17 +140,20 @@ class App extends React.Component {
 
 	onPositionChanged(position) {
 		this.setState(prevState => ({
-			position: position,
-			playingNotes: getPlayingNotes(prevState.musicXml, position)
+			position: Math.round(position),
+			playingNotes: getPlayingNotes(prevState.musicXml, prevState.tracks, position)
 		}));
 	}
 
 	togglePlay() {
+		this.setState({
+			playing: !this.state.playing,
+			waitingNotes: []
+		});
+
 		if(this.state.playing) {
-			this.setState({playing: false});
 			this.playTimer.stopTimer();
 		} else {
-			this.setState({playing: true});
 			this.playTimer.startTimer();
 		}
 	}
@@ -264,7 +281,7 @@ class App extends React.Component {
 				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>
 
 				<div className="bottomContent">
-					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
+					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
 					<Controls onPlay={this.togglePlay} playing={this.state.playing}/>
 				</div>
 			</div>
