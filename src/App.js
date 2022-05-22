@@ -33,6 +33,8 @@ function getWaitingNotes(musicXml, tracks, prevPosition, position) {
 		return (note.startTime > prevPosition && note.startTime <= position);
 	});
 
+	console.log(prevPosition, position, waitingNotes.map(note => note.pitch.getFullNoteName()));
+
 	return _.uniq(waitingNotes, false, note => note.pitch.getMidiNumber());
 }
 
@@ -105,11 +107,20 @@ class App extends React.Component {
 		const tempo = this.state.tempo / 50;
 
 		if(this.state.waitingNotes.length == 0) {
-			this.setState(prevState => ({
-				position: Math.round(prevState.position + (amount * tempo)),
-				waitingNotes: getWaitingNotes(prevState.musicXml, prevState.tracks, prevState.position, prevState.position + (amount * tempo)),
-				playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
-			}));
+			this.setState(prevState => {
+				const newPosition = Math.round(prevState.position + (amount * tempo));
+				return {
+					position: newPosition,
+					waitingNotes: getWaitingNotes(
+						prevState.musicXml,
+						prevState.tracks,
+						Math.max(prevState.minWaitingPosition, prevState.position),
+						newPosition
+					),
+					minWaitingPosition: (newPosition < prevState.minWaitingPosition - 5) ? newPosition : Math.max(prevState.minWaitingPosition, newPosition),
+					playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
+				}
+			});
 		}
 	}
 
@@ -148,7 +159,8 @@ class App extends React.Component {
 	togglePlay() {
 		this.setState({
 			playing: !this.state.playing,
-			waitingNotes: []
+			waitingNotes: [],
+			minWaitingPosition: this.state.position
 		});
 
 		if(this.state.playing) {
@@ -210,7 +222,7 @@ class App extends React.Component {
 				if(event.keyCode === ARROW_LEFT) {
 					if(measure.startTime < this.state.position) {
 						if(!position || measure.startTime > position) {
-							position = measure.startTime;
+							position = measure.startTime - 1;
 						}
 					}
 				} else if(event.keyCode === ARROW_RIGHT) {
@@ -252,7 +264,11 @@ class App extends React.Component {
 		function scroll() {
 			if(--steps >= 0) {
 				position += change;
-				this.setState({ position: Math.round(position) });
+				this.setState({
+					position: Math.round(position),
+					waitingNotes: [],
+					minWaitingPosition: 0
+				});
 			} else {
 				clearInterval(timer);
 			}
