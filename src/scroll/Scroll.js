@@ -126,6 +126,8 @@ const Scroll = props => {
 						.append("rect")
 						.attr("x", leftMargin + getPosition(pitch) - 1)
 						.attr("y", y)
+						.attr("rx", 3)
+						.attr("ry", 3)
 						.attr("width", keyWidth * 0.9)
 						.attr("height", duration)
 						.attr("stroke", black)
