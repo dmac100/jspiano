@@ -116,6 +116,7 @@ class App extends React.Component {
 						Math.max(prevState.minWaitingPosition, prevState.position),
 						newPosition
 					),
+					playingNotes: getPlayingNotes(prevState.musicXml, prevState.tracks, newPosition),
 					minWaitingPosition: (newPosition < prevState.minWaitingPosition - 5) ? newPosition : Math.max(prevState.minWaitingPosition, newPosition),
 					playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
 				}
@@ -225,7 +226,7 @@ class App extends React.Component {
 						}
 					}
 				} else if(event.keyCode === ARROW_RIGHT) {
-					if(measure.startTime > this.state.position) {
+					if(measure.startTime > this.state.position + 1) {
 						if(!position || measure.startTime < position) {
 							position = measure.startTime;
 						}
@@ -263,11 +264,12 @@ class App extends React.Component {
 		function scroll() {
 			if(--steps >= 0) {
 				position += change;
-				this.setState({
+				this.setState(prevState => ({
 					position: Math.round(position),
 					waitingNotes: [],
-					minWaitingPosition: 0
-				});
+					minWaitingPosition: 0,
+					playingNotes: getPlayingNotes(prevState.musicXml, prevState.tracks, position)
+				}));
 			} else {
 				clearInterval(timer);
 			}

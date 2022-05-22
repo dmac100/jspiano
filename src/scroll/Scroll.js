@@ -41,6 +41,30 @@ function getActiveTracks(tracks) {
 	return activeTracks;
 }
 
+/*
+* Disable onScroll callback for some time after setting scrollTop so we don't send back a value we just received.
+* Prevents small jumps back and forth in the scrolling.
+*/
+class OnScrollDisabledTimer {
+	constructor() {
+		this.timer = 0;
+		this.onScrollDisabled = false;
+	}
+
+	disableOnScroll() {
+		if(this.timer != 0) {
+			clearTimeout(this.timer);
+		}
+
+		this.onScrollDisabled = true;
+		this.timer = setTimeout(() => this.onScrollDisabled = false, 100);
+	}
+
+	isOnScrollDisabled() {
+		return this.onScrollDisabled;
+	}
+}
+
 const Scroll = props => {
 	const scrollRef = React.createRef();
 	const svgRef = React.createRef();
@@ -50,8 +74,11 @@ const Scroll = props => {
 	const scale = (props.scale / 10) + 0.1;
 	const totalHeight = props.musicXml ? (props.musicXml.length * scale) + 1000 : 2000;
 
+	const [onScrollDisabledTimer, setOnScrollDisabledTimer] = React.useState(new OnScrollDisabledTimer());
+
 	React.useEffect(() => {
 		scrollRef.current.scrollTop = (totalHeight / scale - props.position) * scale - scrollRef.current.clientHeight;
+		onScrollDisabledTimer.disableOnScroll();
 
 		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks !== prevProps.tracks || props.scale !== prevProps.scale) {
 			renderSvg();
@@ -59,7 +86,9 @@ const Scroll = props => {
 	});
 
 	function onScroll() {
-		props.onScroll((totalHeight - (scrollRef.current.scrollTop + scrollRef.current.clientHeight)) / scale);
+		if(!onScrollDisabledTimer.isOnScrollDisabled()) {
+			props.onScroll((totalHeight - (scrollRef.current.scrollTop + scrollRef.current.clientHeight)) / scale);
+		}
 	}
 
 	function renderSvg() {
