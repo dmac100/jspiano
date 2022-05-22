@@ -28,6 +28,7 @@ test('gets measures and notes', () => {
 		pitch: {
 			midiNumber: 46
 		},
+		wholeNoteStartTime: 53.25,
 		startTime: 25560
 	});
 

@@ -21,10 +21,13 @@ class MusicXmlParser {
 		$(xml).find("part").each((_, part) => {
 			const partId = $(part).attr("id");
 
+			let wholeNoteStartTime = 0;
+			let prevWholeNoteStartTime = 0;
 			let startTime = 0;
 			let prevStartTime = 0;
 			let tied = false;
 			let beats = 4;
+			let divisions = 120;
 
 			measures = [];
 
@@ -39,6 +42,9 @@ class MusicXmlParser {
 							beats = attributeBeats;
 							measures[measures.length - 1].beats = beats;
 						}
+						if(attributeDivisions > 0) {
+							divisions = attributeDivisions;
+						}
 					} if(child.tagName === 'note') {
 						const duration = +$(child).children("duration").text();
 
@@ -48,6 +54,7 @@ class MusicXmlParser {
 
 						if(chord.length > 0) {
 							startTime = prevStartTime;
+							wholeNoteStartTime = prevWholeNoteStartTime;
 						}
 
 						if(pitch.length > 0) {
@@ -60,6 +67,7 @@ class MusicXmlParser {
 							} else {
 								notes.push({
 									pitch: new Pitch(step + octave).transpose(+alter),
+									wholeNoteStartTime: wholeNoteStartTime,
 									startTime: startTime,
 									duration: duration,
 									part: scoreParts.get(partId),
@@ -70,6 +78,9 @@ class MusicXmlParser {
 
 						prevStartTime = startTime;
 						startTime += duration;
+
+						prevWholeNoteStartTime = wholeNoteStartTime;
+						wholeNoteStartTime += (duration / divisions) / 4;
 
 						const tie = $(child).find("tie");
 						if(tie.length > 0) {
@@ -83,9 +94,12 @@ class MusicXmlParser {
 					} else if(child.tagName === 'backup') {
 						const duration = +$(child).children("duration").text();
 						startTime -= duration;
+						wholeNoteStartTime -= (duration / divisions) / 4;
 					} else if(child.tagName === 'forward') {
 						const duration = +$(child).children("duration").text();
 						startTime += duration;
+						wholeNoteStartTime += (duration / divisions) / 4;
+
 					}
 				});
 
