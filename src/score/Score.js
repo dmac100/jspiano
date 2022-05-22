@@ -1,5 +1,5 @@
 import React from 'react';
-import * as d3 from 'd3';
+import * as opensheetmusicdisplay from 'opensheetmusicdisplay';
 import './Score.css';
 
 function usePrevious(value) {
@@ -12,32 +12,38 @@ function usePrevious(value) {
 
 const Score = props => {
 	const scrollRef = React.useRef();
-	const svgRef = React.useRef();
+	const scoreRef = React.useRef();
 
 	const prevProps = usePrevious(props);
 
 	React.useEffect(() => {
 		scrollRef.current.scrollLeft = props.position;
-		if(!prevProps || props.rects !== prevProps.rects) {
+		if(!prevProps || props.musicXml !== prevProps.musicXml) {
 			renderSvg();
 		}
 	});
 
-	function onScroll() {
-		props.onScroll(scrollRef.current.scrollLeft);
-	}
-
 	function renderSvg() {
-		const svg = svgRef.current;
+		const score = scoreRef.current;
 
-		d3.select(svg)
-			.attr("width", 200 * 1000 + 1000);
+		if(props.musicXml) {
+			score.innerHTML = '';
+
+			var osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(scoreRef.current, {
+				backend: 'svg',
+				autoResize: false,
+				drawTitle: false
+			});
+
+			osmd.load(props.musicXml.xml)
+				.then(osmd.render());
+		}
 	}	
 
 	return (
-		<div className="scoreScroll" ref={scrollRef} onScroll={onScroll}>
-			<svg className="svg" ref={svgRef}>
-			</svg>
+		<div className="scoreScroll" ref={scrollRef}>
+			<div className="score" ref={scoreRef}>
+			</div>
 		</div>
 	);
 };

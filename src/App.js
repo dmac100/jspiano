@@ -1,7 +1,8 @@
 import React from 'react';
-import './App.css';
 import raw from 'raw.macro';
 import _ from 'underscore';
+
+import './App.css';
 
 import Pitch from './model/pitch.js';
 import Keyboard from './keyboard/Keyboard.js';
@@ -32,8 +33,6 @@ function getWaitingNotes(musicXml, tracks, prevPosition, position) {
 
 		return (note.startTime > prevPosition && note.startTime <= position);
 	});
-
-	console.log(prevPosition, position, waitingNotes.map(note => note.pitch.getFullNoteName()));
 
 	return _.uniq(waitingNotes, false, note => note.pitch.getMidiNumber());
 }
@@ -292,7 +291,8 @@ class App extends React.Component {
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
 					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
 				</div>
-				{/*<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>*/}
+
+				<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
 
 				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>
 
