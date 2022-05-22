@@ -56,9 +56,6 @@ const Score = props => {
 		cursor.show();
 
 		cursor.cursorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-		window.cursorElement = cursor.cursorElement;
-		window.scroll = scrollRef.current;
 	}
 
 	function renderSvg() {
