@@ -34,13 +34,15 @@ const Score = props => {
 				return note.wholeNoteStartTime;
 			}
 		}
-		return 0;
+		return -1;
 	}
 
 	function setCursorPosition(position) {
 		if(!cursor) return;
 
 		const targetTime = getWholeNoteTime(position);
+
+		if(targetTime == -1) return;
 
 		if(cursor.iterator.currentTimeStamp.realValue > targetTime + 0.00001) {
 			cursor.reset();
