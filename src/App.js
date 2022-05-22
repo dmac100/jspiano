@@ -69,8 +69,8 @@ class App extends React.Component {
 			musicXml: musicXml,
 			playingNotes: [],
 			playing: false,
-			tempo: 50,
-			scale: 50
+			tempo: 20,
+			scale: 20
 		};
 
 		this.onPositionChanged = this.onPositionChanged.bind(this);
@@ -257,7 +257,7 @@ class App extends React.Component {
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
-					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange}/>
+					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
 				</div>
 				{/*<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>*/}
 

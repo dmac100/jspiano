@@ -13,11 +13,10 @@ function usePrevious(value) {
 
 const keyWidth = 12;
 const leftMargin = 10;
-const scale = 1;
 
-function getNoteTop(totalHeight, note) {
-	const startTime = note.startTime / scale;
-	const duration = note.duration / scale;
+function getNoteTop(totalHeight, note, scale) {
+	const startTime = note.startTime * scale;
+	const duration = note.duration * scale;
 	
 	return totalHeight - startTime - duration;
 }
@@ -48,17 +47,19 @@ const Scroll = props => {
 
 	const prevProps = usePrevious(props);
 
-	const totalHeight = props.musicXml ? props.musicXml.length + 1000 : 2000;
+	const scale = (props.scale / 10) + 0.1;
+	const totalHeight = props.musicXml ? (props.musicXml.length * scale) + 1000 : 2000;
 
 	React.useEffect(() => {
-		scrollRef.current.scrollTop = totalHeight - (props.position + scrollRef.current.clientHeight);
-		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks !== prevProps.tracks) {
+		scrollRef.current.scrollTop = (totalHeight / scale - props.position) * scale - scrollRef.current.clientHeight;
+
+		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks !== prevProps.tracks || props.scale !== prevProps.scale) {
 			renderSvg();
 		}
 	});
 
 	function onScroll() {
-		props.onScroll(totalHeight - (scrollRef.current.scrollTop + scrollRef.current.clientHeight));
+		props.onScroll((totalHeight - (scrollRef.current.scrollTop + scrollRef.current.clientHeight)) / scale);
 	}
 
 	function renderSvg() {
@@ -95,8 +96,8 @@ const Scroll = props => {
 		if(props.musicXml) {
 			// Draw the barlines.
 			props.musicXml.measures.forEach(measure => {
-				const measureStartY = totalHeight - (measure.startTime / scale);
-				const measureEndY = totalHeight - (measure.endTime / scale);
+				const measureStartY = totalHeight - (measure.startTime * scale);
+				const measureEndY = totalHeight - (measure.endTime * scale);
 
 				for(let i = 0; i < measure.beats; i++) {
 					const measureY = measureStartY + (measureEndY - measureStartY) * (i / measure.beats);
@@ -117,9 +118,9 @@ const Scroll = props => {
 			props.musicXml.notes.forEach(note => {
 				if(activeTracks.has(note.part.partId)) {
 					const pitch = note.pitch.getMidiNumber();
-					const duration = note.duration / scale;
+					const duration = note.duration * scale;
 
-					const y = getNoteTop(totalHeight, note);
+					const y = getNoteTop(totalHeight, note, scale);
 
 					d3.select(svg)
 						.append("rect")
