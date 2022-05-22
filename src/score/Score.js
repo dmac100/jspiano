@@ -42,7 +42,7 @@ const Score = props => {
 
 		const targetTime = getWholeNoteTime(position);
 
-		if(cursor.iterator.currentTimeStamp.realValue > targetTime) {
+		if(cursor.iterator.currentTimeStamp.realValue > targetTime + 0.00001) {
 			cursor.reset();
 		}
 
