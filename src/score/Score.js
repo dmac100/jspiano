@@ -31,7 +31,6 @@ const Score = props => {
 		const notes = _.sortBy(props.musicXml.notes, note => note.startTime);
 		for(let note of notes) {
 			if(note.startTime + 1 >= position) {
-				console.log(position, note.startTime, note.wholeNoteStartTime);
 				return note.wholeNoteStartTime;
 			}
 		}
