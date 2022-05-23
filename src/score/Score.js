@@ -45,15 +45,18 @@ const Score = props => {
 
 		if(targetTime == -1) return;
 
+
 		if(cursor.iterator.currentTimeStamp.realValue > targetTime + 0.00001) {
 			cursor.reset();
 		}
 
+		const iterator = cursor.iterator;
+
 		// Advance cursor until past targetTime.
-		let currentTime = cursor.iterator.currentTimeStamp.realValue;
+		let currentTime = iterator.currentTimeStamp.realValue;
 		while(currentTime < targetTime) {
-			cursor.next();
-			currentTime = cursor.iterator.currentTimeStamp.realValue;
+			iterator.moveToNext();
+			currentTime = iterator.currentTimeStamp.realValue;
 		}
 
 		cursor.show();
