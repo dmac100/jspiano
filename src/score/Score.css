@@ -4,11 +4,11 @@
 
 	margin: 0px;
 	width: 1270px;
-	height: 200px;
 	border: 1px solid #ccc;
-	flex-grow: 1;
+	height: 200px;
 
 	background-color: #fff;
+	flex-grow: 1;
 	align-self: center;
 }
 

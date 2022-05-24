@@ -3,12 +3,12 @@
 	overflow-y: scroll;
 
 	margin: 0px;
+	border: 1px solid #ccc;
 	width: 1270px;
 	height: 200px;
-	border: 1px solid #ccc;
-	flex-grow: 1;
 
 	background-color: #fff;
+	flex-grow: 1;
 	align-self: center;
 }
 

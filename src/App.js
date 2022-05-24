@@ -1,6 +1,7 @@
 import React from 'react';
 import raw from 'raw.macro';
 import _ from 'underscore';
+import Split from 'react-split';
 
 import './App.css';
 
@@ -301,6 +302,8 @@ class App extends React.Component {
 	}
 
 	render() {
+		let middleContent = <div/>;
+
 		let score = <div/>;
 		let scroll = <div/>;
 
@@ -312,6 +315,25 @@ class App extends React.Component {
 			scroll = (<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>);
 		}
 
+		if(this.state.showScore && this.state.showScroll) {
+			middleContent = (
+				<Split className="split" direction="vertical" gutterSize={7} minSize={0}>
+					{score}
+					{scroll}
+				</Split>
+			);
+		} else {
+			middleContent = this.state.showScore ? score : scroll;
+		}
+
+		if(this.state.showScore && this.state.showScroll) {
+			middleContent = (
+				<Split className="split" direction="vertical" gutterSize={7} minSize={0}>
+					{middleContent}
+				</Split>
+			);
+		}
+
 		return (
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
@@ -320,9 +342,7 @@ class App extends React.Component {
 					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
 				</div>
 
-				{score}
-
-				{scroll}
+				{middleContent}
 
 				<div className="bottomContent">
 					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
