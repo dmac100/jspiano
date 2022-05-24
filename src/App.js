@@ -9,7 +9,8 @@ import Keyboard from './keyboard/Keyboard.js';
 import Scroll from './scroll/Scroll.js';
 import Score from './score/Score.js';
 import Tracks from './tracks/Tracks.js';
-import Controls from './controls/Controls.js';
+import TopButtons from './controls/TopButtons.js';
+import BottomButtons from './controls/BottomButtons.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
 
@@ -80,7 +81,9 @@ class App extends React.Component {
 			waitingNotes: [],
 			playing: false,
 			tempo: 20,
-			scale: 20
+			scale: 20,
+			showScore: true,
+			showScroll: true
 		};
 
 		this.onPositionChanged = this.onPositionChanged.bind(this);
@@ -93,6 +96,8 @@ class App extends React.Component {
 		this.setPositionSmooth = this.setPositionSmooth.bind(this);
 		this.onTempoChange = this.onTempoChange.bind(this);
 		this.onScaleChange = this.onScaleChange.bind(this);
+		this.onToggleShowScroll = this.onToggleShowScroll.bind(this);
+		this.onToggleShowScore = this.onToggleShowScore.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
@@ -185,6 +190,7 @@ class App extends React.Component {
 
 		if(event.keyCode === SPACE) {
 			this.togglePlay();
+			event.preventDefault();
 		}
 
 		const activeTracks = getActiveTracks(this.state.tracks);
@@ -286,21 +292,41 @@ class App extends React.Component {
 		this.setState({ scale: value });
 	}
 
+	onToggleShowScore() {
+		this.setState(prevState => ({ showScore: !prevState.showScore || !prevState.showScroll }));
+	}
+
+	onToggleShowScroll() {
+		this.setState(prevState => ({ showScroll: !prevState.showScroll || !prevState.showScore }));
+	}
+
 	render() {
+		let score = <div/>;
+		let scroll = <div/>;
+
+		if(this.state.showScore) {
+			score = (<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>);
+		}
+
+		if(this.state.showScroll) {
+			scroll = (<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>);
+		}
+
 		return (
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
+					<TopButtons showScroll={this.state.showScroll} showScore={this.state.showScore} onToggleShowScore={this.onToggleShowScore} onToggleShowScroll={this.onToggleShowScroll}/>
 					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
 				</div>
 
-				<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>
+				{score}
 
-				<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>
+				{scroll}
 
 				<div className="bottomContent">
 					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
-					<Controls onPlay={this.togglePlay} playing={this.state.playing}/>
+					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing}/>
 				</div>
 			</div>
 		);

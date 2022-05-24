@@ -1,0 +1,9 @@
+.topButtons {
+	margin-top: 10px;
+	text-align: center;
+}
+
+.topButtons .button {
+	margin: 5px;
+	padding: 5px;
+}

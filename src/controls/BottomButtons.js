@@ -1,13 +1,13 @@
 import React from 'react';
 import * as d3 from 'd3';
-import './Controls.css';
+import './BottomButtons.css';
 
-const Controls = (props) => {
+const BottomButtons = (props) => {
 	return (
-		<div className="controls">
+		<div className="bottomButtons">
 			<button className="play button" onClick={props.onPlay}>{props.playing ? 'Stop' : 'Play'}</button>
 		</div>
 	);
 };
 
-export default Controls;
+export default BottomButtons;
