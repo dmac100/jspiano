@@ -324,14 +324,14 @@ class App extends React.Component {
 			);
 		} else {
 			middleContent = this.state.showScore ? score : scroll;
-		}
 
-		if(this.state.showScore && this.state.showScroll) {
-			middleContent = (
-				<Split className="split" direction="vertical" gutterSize={7} minSize={0}>
-					{middleContent}
-				</Split>
-			);
+			if(this.state.showScore && this.state.showScroll) {
+				middleContent = (
+					<Split className="split" direction="vertical" gutterSize={7} minSize={0}>
+						{middleContent}
+					</Split>
+				);
+			}
 		}
 
 		return (
