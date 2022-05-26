@@ -28,9 +28,9 @@ const Score = props => {
 	setCursorPosition(props.position);
 
 	function getWholeNoteTime(position) {
-		const notes = _.sortBy(props.musicXml.notes, note => note.startTime);
+		const notes = _.sortBy(props.musicXml.notes, note => -note.startTime);
 		for(let note of notes) {
-			if(note.startTime + 1 >= position) {
+			if(note.startTime <= position + 1) {
 				return note.wholeNoteStartTime;
 			}
 		}

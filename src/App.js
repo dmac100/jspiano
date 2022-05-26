@@ -229,7 +229,7 @@ class App extends React.Component {
 				if(event.keyCode === ARROW_LEFT) {
 					if(measure.startTime < this.state.position) {
 						if(!position || measure.startTime > position) {
-							position = measure.startTime - 1;
+							position = measure.startTime;
 						}
 					}
 				} else if(event.keyCode === ARROW_RIGHT) {
