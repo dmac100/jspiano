@@ -50,9 +50,9 @@ class PlayTimer {
 
 		this.timer = setInterval(() => {
 			if(this.advanceCallback) {
-				this.advanceCallback(5);
+				this.advanceCallback(4);
 			}
-		}, 10);
+		}, 50);
 	}
 
 	stopTimer() {
