@@ -19,7 +19,7 @@ import {playMidiNote} from './controls/MidiSetup.js';
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
 function getPlayingNotes(musicXml, tracks, position) {
-	const activeTracks = new Set(tracks.filter(track => track.active).map(track => track.id));
+	const activeTracks = getActiveTracks(tracks);
 
 	return musicXml.notes.filter(note => {
 		if(!activeTracks.has(note.part.partId)) return false;
@@ -29,7 +29,7 @@ function getPlayingNotes(musicXml, tracks, position) {
 }
 
 function getWaitingNotes(musicXml, tracks, prevPosition, position) {
-	const waitingTracks = new Set(tracks.filter(track => track.wait).map(track => track.id));
+	const waitingTracks = getWaitingTracks(tracks);
 
 	const waitingNotes = musicXml.notes.filter(note => {
 		if(!waitingTracks.has(note.part.partId)) return false;
@@ -71,6 +71,10 @@ function getActiveTracks(tracks) {
 	return new Set(tracks.filter(track => track.active).map(track => track.id));
 }
 
+function getWaitingTracks(tracks) {
+	return new Set(tracks.filter(track => track.wait).map(track => track.id));
+}
+
 class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -106,7 +110,12 @@ class App extends React.Component {
 	}
 
 	playNotes(musicXml, prevPosition, position) {
+		const waitingTracks = getWaitingTracks(this.state.tracks);
+
+		// Play the new notes started between prevPosition and position that aren't in a wait track.
 		let notes = musicXml.notes.filter(note => {
+			if(waitingTracks.has(note.part.partId)) return false;
+
 			return (note.startTime > prevPosition && note.startTime <= position);
 		});
 
