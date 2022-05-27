@@ -1,0 +1,10 @@
+.midiSelect label {
+	display: inline-block;
+	min-width: 150px;
+	padding: 5px;
+}
+
+.midiSelect select {
+	display: inline-block;
+	min-width: 400px;
+}
