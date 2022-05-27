@@ -14,7 +14,7 @@ import TopButtons from './controls/TopButtons.js';
 import BottomButtons from './controls/BottomButtons.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
-import {playMidiNote} from './controls/MidiSetup.js';
+import {playMidiNote, addMidiNoteOnListener} from './controls/MidiSetup.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
@@ -104,9 +104,12 @@ class App extends React.Component {
 		this.onScaleChange = this.onScaleChange.bind(this);
 		this.onToggleShowScroll = this.onToggleShowScroll.bind(this);
 		this.onToggleShowScore = this.onToggleShowScore.bind(this);
+		this.onNoteOn = this.onNoteOn.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
+
+		addMidiNoteOnListener(this.onNoteOn);
 	}
 
 	playNotes(musicXml, prevPosition, position) {
@@ -182,7 +185,10 @@ class App extends React.Component {
 
 	onKeyClicked(pitch) {
 		playMidiNote(pitch);
+		this.onNoteOn(pitch);
+	}
 
+	onNoteOn(pitch) {
 		this.setState(prevState => ({
 			waitingNotes: prevState.waitingNotes.filter(note => !note.pitch.equals(pitch))
 		}));
