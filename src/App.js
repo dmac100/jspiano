@@ -126,6 +126,19 @@ class App extends React.Component {
 		});
 	}
 
+	playNotesAtPosition(musicXml, position) {
+		// Play notes that begin at position
+		let notes = musicXml.notes.filter(note => {
+			return (note.startTime >= position - 1 && note.startTime <= position + 1);
+		});
+
+		notes = _.uniq(notes, false, note => note.pitch.getMidiNumber());
+
+		notes.forEach(note => {
+			playMidiNote(note.pitch);
+		});
+	}
+
 	advance(amount) {
 		if(!this.state.playing) {
 			this.playTimer.stopTimer();
@@ -304,6 +317,7 @@ class App extends React.Component {
 					playingNotes: getPlayingNotes(prevState.musicXml, prevState.tracks, position)
 				}));
 			} else {
+				this.playNotesAtPosition(this.state.musicXml, newPosition);
 				clearInterval(timer);
 			}
 		}
