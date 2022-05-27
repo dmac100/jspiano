@@ -14,6 +14,7 @@ import TopButtons from './controls/TopButtons.js';
 import BottomButtons from './controls/BottomButtons.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
+import {playMidiNote} from './controls/MidiSetup.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
@@ -104,12 +105,26 @@ class App extends React.Component {
 		this.playTimer.setAdvanceCallback(this.advance);
 	}
 
+	playNotes(musicXml, prevPosition, position) {
+		let notes = musicXml.notes.filter(note => {
+			return (note.startTime > prevPosition && note.startTime <= position);
+		});
+
+		notes = _.uniq(notes, false, note => note.pitch.getMidiNumber());
+
+		notes.forEach(note => {
+			playMidiNote(note.pitch);
+		});
+	}
+
 	advance(amount) {
 		if(!this.state.playing) {
 			this.playTimer.stopTimer();
 		}
 
 		const tempo = this.state.tempo / 50;
+
+		this.playNotes(this.state.musicXml, this.state.position, this.state.position + (amount * tempo));
 
 		if(this.state.waitingNotes.length == 0) {
 			this.setState(prevState => {
@@ -144,6 +159,8 @@ class App extends React.Component {
 	}
 
 	onKeyClicked(pitch) {
+		playMidiNote(pitch);
+
 		this.setState(prevState => ({
 			waitingNotes: prevState.waitingNotes.filter(note => !note.pitch.equals(pitch))
 		}));
