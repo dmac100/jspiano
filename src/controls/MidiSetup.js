@@ -22,6 +22,12 @@ function playMidiNote(pitch) {
 	}
 }
 
+function stopMidiNote(pitch) {
+	if(midiOutput) {
+		midiOutput.channels[1].sendNoteOff(pitch.getMidiNumber());
+	}
+}
+
 function addMidiNoteOnListener(listener) {
 	noteOnListeners.push(listener);
 }
@@ -83,5 +89,5 @@ const MidiSetup = (props) => {
 	);
 };
 
-export {playMidiNote, addMidiNoteOnListener, addMidiNoteOffListener};
+export {playMidiNote, stopMidiNote, addMidiNoteOnListener, addMidiNoteOffListener};
 export default MidiSetup;

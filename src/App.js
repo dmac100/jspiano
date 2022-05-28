@@ -14,7 +14,7 @@ import TopButtons from './controls/TopButtons.js';
 import BottomButtons from './controls/BottomButtons.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
-import {playMidiNote, addMidiNoteOnListener, addMidiNoteOffListener} from './controls/MidiSetup.js';
+import {playMidiNote, stopMidiNote, addMidiNoteOnListener, addMidiNoteOffListener} from './controls/MidiSetup.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
@@ -96,7 +96,8 @@ class App extends React.Component {
 		this.onPositionChanged = this.onPositionChanged.bind(this);
 		this.createTracks = this.createTracks.bind(this);
 		this.onTrackChange = this.onTrackChange.bind(this);
-		this.onKeyClicked = this.onKeyClicked.bind(this);
+		this.onMouseDown = this.onMouseDown.bind(this);
+		this.onMouseUp = this.onMouseUp.bind(this);
 		this.togglePlay = this.togglePlay.bind(this);
 		this.advance = this.advance.bind(this);
 		this.onKeyDown = this.onKeyDown.bind(this);
@@ -186,9 +187,14 @@ class App extends React.Component {
 		}));
 	}
 
-	onKeyClicked(pitch) {
+	onMouseDown(pitch) {
 		playMidiNote(pitch);
 		this.onNoteOn(pitch);
+	}
+
+	onMouseUp(pitch) {
+		stopMidiNote(pitch);
+		this.onNoteOff(pitch);
 	}
 
 	onNoteOn(pitch) {
@@ -401,7 +407,7 @@ class App extends React.Component {
 				{middleContent}
 
 				<div className="bottomContent">
-					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} midiOnNotes={this.state.midiOnNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
+					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} midiOnNotes={this.state.midiOnNotes} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}/>
 					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing}/>
 				</div>
 			</div>

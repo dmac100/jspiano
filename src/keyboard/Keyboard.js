@@ -27,10 +27,9 @@ function getActiveTracks(tracks) {
 const Keyboard = (props) => {
 	const svgRef = React.useRef();
 
-	React.useEffect(() => renderSvg());
+	const [pitchPressed, setPressedPitch] = React.useState(null);
 
-	const blackKey = [];
-	const whiteKeys = [];
+	React.useEffect(() => renderSvg());
 
 	function getSelectedColor(pitch, activeTracks) {
 		for(var note of props.midiOnNotes) {
@@ -112,7 +111,25 @@ const Keyboard = (props) => {
 		return keys;
 	}
 
-	function onClick(event) {
+	function onMouseDown(event) {
+		const svg = svgRef.current;
+
+		const pitch = getPitchForMouseEvent(event);
+		if(pitch) {
+			setPressedPitch(pitch);
+			svg.setPointerCapture(event.pointerId);
+			props.onMouseDown(pitch);
+		}
+	}
+
+	function onMouseUp(event) {
+		const svg = svgRef.current;
+
+		svg.releasePointerCapture(event.pointerId);
+		props.onMouseUp(pitchPressed);
+	}
+
+	function getPitchForMouseEvent(event) {
 		const svg = svgRef.current;
 
 		const clickX = event.clientX - svg.getBoundingClientRect().x;
@@ -120,17 +137,17 @@ const Keyboard = (props) => {
 
 		for(const key of getBlackKeys()) {
 			if(inRect(clickX, clickY, key)) {
-				props.onClick(key.pitch);
-				return;
+				return key.pitch;
 			}
 		}
 
 		for(const key of getWhiteKeys()) {
 			if(inRect(clickX, clickY, key)) {
-				props.onClick(key.pitch);
-				return;
+				return key.pitch;
 			}
 		}
+
+		return null;
 	}
 
 	function renderSvg() {
@@ -251,7 +268,7 @@ const Keyboard = (props) => {
 	}
 
 	return (
-		<svg className="keyboardSvg" ref={svgRef} onClick={event => onClick(event)}>
+		<svg className="keyboardSvg" ref={svgRef} onPointerDown={onMouseDown} onPointerUp={onMouseUp}>
 		</svg>
 	);
 };
