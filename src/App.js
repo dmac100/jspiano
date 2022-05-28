@@ -14,7 +14,7 @@ import TopButtons from './controls/TopButtons.js';
 import BottomButtons from './controls/BottomButtons.js';
 import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
-import {playMidiNote, addMidiNoteOnListener} from './controls/MidiSetup.js';
+import {playMidiNote, addMidiNoteOnListener, addMidiNoteOffListener} from './controls/MidiSetup.js';
 
 const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
 
@@ -85,6 +85,7 @@ class App extends React.Component {
 			musicXml: musicXml,
 			playingNotes: [],
 			waitingNotes: [],
+			midiOnNotes: [],
 			playing: false,
 			tempo: 20,
 			scale: 20,
@@ -105,11 +106,13 @@ class App extends React.Component {
 		this.onToggleShowScroll = this.onToggleShowScroll.bind(this);
 		this.onToggleShowScore = this.onToggleShowScore.bind(this);
 		this.onNoteOn = this.onNoteOn.bind(this);
+		this.onNoteOff = this.onNoteOff.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
 
 		addMidiNoteOnListener(this.onNoteOn);
+		addMidiNoteOffListener(this.onNoteOff);
 	}
 
 	playNotes(musicXml, prevPosition, position) {
@@ -190,7 +193,14 @@ class App extends React.Component {
 
 	onNoteOn(pitch) {
 		this.setState(prevState => ({
-			waitingNotes: prevState.waitingNotes.filter(note => !note.pitch.equals(pitch))
+			waitingNotes: prevState.waitingNotes.filter(note => !note.pitch.equals(pitch)),
+			midiOnNotes: _.uniq(prevState.midiOnNotes.concat([pitch.getMidiNumber()]))
+		}));
+	}
+
+	onNoteOff(pitch) {
+		this.setState(prevState => ({
+			midiOnNotes: prevState.midiOnNotes.filter(note => note !== pitch.getMidiNumber())
 		}));
 	}
 
@@ -391,7 +401,7 @@ class App extends React.Component {
 				{middleContent}
 
 				<div className="bottomContent">
-					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
+					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} midiOnNotes={this.state.midiOnNotes} onClick={this.onKeyClicked} onKeyUp={this.onKeyUp}/>
 					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing}/>
 				</div>
 			</div>

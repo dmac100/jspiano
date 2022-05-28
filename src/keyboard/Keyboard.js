@@ -33,6 +33,12 @@ const Keyboard = (props) => {
 	const whiteKeys = [];
 
 	function getSelectedColor(pitch, activeTracks) {
+		for(var note of props.midiOnNotes) {
+			if(note === pitch.getMidiNumber()) {
+				return '#e33';
+			}
+		}
+
 		for(var note of props.waitingNotes) {
 			if(note.pitch.equals(pitch)) {
 				return '#e33';

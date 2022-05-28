@@ -9,6 +9,7 @@ const midiInputs = [];
 const midiOutputs = [];
 
 const noteOnListeners = [];
+const noteOffListeners = [];
 
 WebMidi.enable().then(function() {
 	WebMidi.inputs.forEach(device => midiInputs.push(device));
@@ -25,8 +26,16 @@ function addMidiNoteOnListener(listener) {
 	noteOnListeners.push(listener);
 }
 
+function addMidiNoteOffListener(listener) {
+	noteOffListeners.push(listener);
+}
+
 function onNoteOn(pitch) {
 	noteOnListeners.forEach(listener => listener(pitch));
+}
+
+function onNoteOff(pitch) {
+	noteOffListeners.forEach(listener => listener(pitch));
 }
 
 const MidiSetup = (props) => {
@@ -38,6 +47,7 @@ const MidiSetup = (props) => {
 			}
 			midiInput = midiInputs[selectedIndex - 1];
 			midiInput.addListener("noteon", e => onNoteOn(new Pitch(e.note.number)));
+			midiInput.addListener("noteoff", e => onNoteOff(new Pitch(e.note.number)));
 		} else {
 			midiInput = null;
 		}
@@ -73,5 +83,5 @@ const MidiSetup = (props) => {
 	);
 };
 
-export {playMidiNote, addMidiNoteOnListener};
+export {playMidiNote, addMidiNoteOnListener, addMidiNoteOffListener};
 export default MidiSetup;
