@@ -117,11 +117,13 @@ class App extends React.Component {
 	}
 
 	playNotes(musicXml, prevPosition, position) {
+		const activeTracks = getActiveTracks(this.state.tracks);
 		const waitingTracks = getWaitingTracks(this.state.tracks);
 
 		// Play the new notes started between prevPosition and position that aren't in a wait track.
 		let notes = musicXml.notes.filter(note => {
 			if(waitingTracks.has(note.part.partId)) return false;
+			if(!activeTracks.has(note.part.partId)) return false;
 
 			return (note.startTime > prevPosition && note.startTime <= position);
 		});
