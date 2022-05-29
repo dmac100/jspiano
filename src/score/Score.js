@@ -18,6 +18,7 @@ const Score = props => {
 	const prevProps = usePrevious(props);
 
 	const [cursor, setCursor] = React.useState();
+	const [osmd, setOsmd] = React.useState();
 
 	React.useEffect(() => {
 		if(!prevProps || props.musicXml !== prevProps.musicXml) {
@@ -26,6 +27,23 @@ const Score = props => {
 	});
 
 	setCursorPosition(props.position);
+
+	function onClick(event) {
+		const score = scoreRef.current;
+
+		const units = opensheetmusicdisplay.unitInPixels;
+		const x = (event.clientX - score.getBoundingClientRect().x) / units;
+		const y = (event.clientY - score.getBoundingClientRect().y) / units;
+
+		if(osmd) {
+			const nearestNote = osmd.graphic.GetNearestNote({x, y}, 5);
+			if(nearestNote) {
+				const wholeNotes = nearestNote.sourceNote.getAbsoluteTimestamp().realValue;
+				const note = _.min(props.musicXml.notes, note => Math.abs(wholeNotes - note.wholeNoteStartTime));
+				props.onScroll(note.startTime);
+			}
+		}
+	}
 
 	function getWholeNoteTime(position) {
 		if(position === 0) {
@@ -82,12 +100,14 @@ const Score = props => {
 				.then(osmd.render());
 
 			setCursor(osmd.cursor);
+
+			setOsmd(osmd);
 		}
 	}
 
 	return (
 		<div className="scoreScroll" ref={scrollRef}>
-			<div className="score" ref={scoreRef}>
+			<div className="score" ref={scoreRef} onClick={onClick}>
 			</div>
 		</div>
 	);
