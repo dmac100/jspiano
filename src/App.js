@@ -5,7 +5,6 @@ import Split from 'react-split';
 
 import './App.css';
 
-import Pitch from './model/pitch.js';
 import Keyboard from './keyboard/Keyboard.js';
 import Scroll from './scroll/Scroll.js';
 import Score from './score/Score.js';
@@ -157,7 +156,7 @@ class App extends React.Component {
 
 		this.playNotes(this.state.musicXml, this.state.position, this.state.position + (amount * tempo));
 
-		if(this.state.waitingNotes.length == 0) {
+		if(this.state.waitingNotes.length === 0) {
 			this.setState(prevState => {
 				const newPosition = Math.round(prevState.position + (amount * tempo));
 				return {
