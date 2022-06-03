@@ -87,7 +87,10 @@ class App extends React.Component {
 			tempo: 20,
 			scale: 20,
 			showScore: true,
-			showScroll: true
+			showScroll: true,
+			repeatEnabled: false,
+			repeatStart: 0,
+			repeatEnd: 0
 		};
 
 		this.onPositionChanged = this.onPositionChanged.bind(this);
@@ -170,17 +173,28 @@ class App extends React.Component {
 
 		if(this.state.waitingNotes.length === 0) {
 			this.setState(prevState => {
-				const newPosition = Math.round(prevState.position + (amount * tempo));
+				let newPosition = Math.round(prevState.position + (amount * tempo));
+				let newMinWaitingPosition = (newPosition < prevState.minWaitingPosition - 5) ? newPosition : Math.max(prevState.minWaitingPosition, newPosition);
+				let jumpBack = false;
+
+				if(prevState.repeatEnabled) {
+					if(newPosition > prevState.repeatEnd) {
+						newPosition = prevState.repeatStart;
+						newMinWaitingPosition = 0;
+						jumpBack = true;
+					}
+				}
+
 				return {
 					position: newPosition,
 					waitingNotes: getWaitingNotes(
 						prevState.musicXml,
 						prevState.tracks,
-						Math.max(prevState.minWaitingPosition, prevState.position),
+						jumpBack ? (newPosition - 1) : Math.max(prevState.minWaitingPosition, prevState.position),
 						newPosition
 					),
 					playingNotes: getPlayingNotes(prevState.musicXml, prevState.tracks, newPosition),
-					minWaitingPosition: (newPosition < prevState.minWaitingPosition - 5) ? newPosition : Math.max(prevState.minWaitingPosition, newPosition),
+					minWaitingPosition: newMinWaitingPosition,
 					playing: (prevState.position + (amount * tempo) >= prevState.musicXml.length) ? false : prevState.playing
 				}
 			});
