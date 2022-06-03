@@ -14,6 +14,13 @@ const noteOffListeners = [];
 WebMidi.enable().then(function() {
 	WebMidi.inputs.forEach(device => midiInputs.push(device));
 	WebMidi.outputs.forEach(device => midiOutputs.push(device));
+
+	if(midiInputs.length > 0) {
+		midiInput = midiInputs[midiInputs.length - 1];
+	}
+	if(midiOutputs.length > 0) {
+		midiOutput = midiOutputs[midiOutputs.length - 1];
+	}
 });
 
 function playMidiNote(pitch) {
