@@ -15,8 +15,6 @@ import MusicXmlParser from './parser/musicXmlParser.js';
 import Sliders from './sliders/Sliders.js';
 import {playMidiNote, stopMidiNote, addMidiNoteOnListener, addMidiNoteOffListener} from './controls/MidiSetup.js';
 
-const musicXml = MusicXmlParser.parse(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
-
 function getPlayingNotes(musicXml, tracks, position) {
 	const activeTracks = getActiveTracks(tracks);
 
@@ -80,8 +78,8 @@ class App extends React.Component {
 
 		this.state = {
 			position: 0,
-			tracks: this.createTracks(musicXml),
-			musicXml: musicXml,
+			tracks: [],
+			musicXml: MusicXmlParser.parse(""),
 			playingNotes: [],
 			waitingNotes: [],
 			midiOnNotes: [],
@@ -107,12 +105,26 @@ class App extends React.Component {
 		this.onToggleShowScore = this.onToggleShowScore.bind(this);
 		this.onNoteOn = this.onNoteOn.bind(this);
 		this.onNoteOff = this.onNoteOff.bind(this);
+		this.onOpen = this.onOpen.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
 
 		addMidiNoteOnListener(this.onNoteOn);
 		addMidiNoteOffListener(this.onNoteOff);
+	}
+
+	componentDidMount() {
+		this.openMusicXml(raw("./testfiles/Chopin - Nocturne 9-2.xml"));
+		//this.openMusicXml("");
+	}
+
+	openMusicXml(musicXml) {
+		const parsed = MusicXmlParser.parse(musicXml);
+		this.setState({
+			tracks: this.createTracks(parsed),
+			musicXml: parsed
+		});
 	}
 
 	playNotes(musicXml, prevPosition, position) {
@@ -312,7 +324,7 @@ class App extends React.Component {
 		if(event.keyCode === HOME) {
 			this.setPositionSmooth(0);
 		} else if(event.keyCode === END) {
-			this.setPositionSmooth(musicXml.length);
+			this.setPositionSmooth(this.state.musicXml.length);
 		}
 
 		// Jump back or forward on page up and down.
@@ -364,6 +376,21 @@ class App extends React.Component {
 		this.setState(prevState => ({ showScroll: !prevState.showScroll || !prevState.showScore }));
 	}
 
+	onOpen() {
+		const input = document.createElement("input");
+		input.setAttribute("type", "file");
+		input.click();
+
+		input.addEventListener('change', () => {
+			const fileReader = new FileReader();
+			fileReader.readAsText(input.files[0]);
+			fileReader.onload = () => {
+				const result = fileReader.result;
+				this.openMusicXml(result);
+			};
+		});
+	}
+
 	render() {
 		let middleContent = <div/>;
 
@@ -401,7 +428,7 @@ class App extends React.Component {
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
-					<TopButtons showScroll={this.state.showScroll} showScore={this.state.showScore} onToggleShowScore={this.onToggleShowScore} onToggleShowScroll={this.onToggleShowScroll}/>
+					<TopButtons onOpen={this.onOpen} showScroll={this.state.showScroll} showScore={this.state.showScore} onToggleShowScore={this.onToggleShowScore} onToggleShowScroll={this.onToggleShowScroll}/>
 					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
 				</div>
 

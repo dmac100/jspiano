@@ -64,7 +64,7 @@ const Score = props => {
 
 		const targetTime = getWholeNoteTime(position);
 
-		if(targetTime == -1) return;
+		if(targetTime === -1) return;
 
 		if(cursor.iterator.currentTimeStamp.realValue > targetTime + 0.00001) {
 			cursor.reset();
@@ -87,7 +87,7 @@ const Score = props => {
 	function renderSvg() {
 		const score = scoreRef.current;
 
-		if(props.musicXml) {
+		if(props.musicXml && props.musicXml.xml) {
 			score.innerHTML = '';
 
 			const osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(scoreRef.current, {
