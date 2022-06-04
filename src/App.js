@@ -412,7 +412,7 @@ class App extends React.Component {
 		let scroll = <div/>;
 
 		if(this.state.showScore) {
-			score = (<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml}/>);
+			score = (<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} repeatEnabled={this.state.repeatEnabled} repeatStart={this.state.repeatStart} repeatEnd={this.state.repeatEnd}/>);
 		}
 
 		if(this.state.showScroll) {
