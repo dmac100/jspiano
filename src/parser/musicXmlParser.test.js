@@ -14,9 +14,9 @@ test('gets measures and notes', () => {
 		endTime: 25920
 	});
 
-	expect(parsed.notes.length).toBe(1234);
+	expect(parsed.notes.length).toBe(1294);
 
-	expect(parsed.notes[1233]).toEqual({
+	expect(parsed.notes[1293]).toEqual({
 		duration: 360,
 		part: {
 			index: 1,
