@@ -1,9 +1,24 @@
 .bottomButtons {
+	display: inline-block;
+	width: 1270px;
+}
+
+.bottomButtons .grid {
+	display: grid;
 	margin-bottom: 10px;
-	text-align: center;
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.bottomButtons .right {
+	justify-self: end;
 }
 
 .bottomButtons .button {
+	padding: 5px;
+	margin-left: 10px;
+}
+
+.bottomButtons .play {
 	padding: 5px 50px 5px;
 	font-weight: bold;
 }

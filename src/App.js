@@ -109,6 +109,9 @@ class App extends React.Component {
 		this.onNoteOn = this.onNoteOn.bind(this);
 		this.onNoteOff = this.onNoteOff.bind(this);
 		this.onOpen = this.onOpen.bind(this);
+		this.onRepeatStart = this.onRepeatStart.bind(this);
+		this.onRepeatEnd = this.onRepeatEnd.bind(this);
+		this.onRepeatClear = this.onRepeatClear.bind(this);
 
 		this.playTimer = new PlayTimer();
 		this.playTimer.setAdvanceCallback(this.advance);
@@ -390,6 +393,30 @@ class App extends React.Component {
 		this.setState(prevState => ({ showScroll: !prevState.showScroll || !prevState.showScore }));
 	}
 
+	onRepeatStart() {
+		this.setState(prevState => ({
+			repeatEnabled: true,
+			repeatStart: prevState.position,
+			repeatEnd: Math.max(prevState.repeatEnd, prevState.position),
+		}));
+	}
+
+	onRepeatEnd() {
+		this.setState(prevState => ({
+			repeatEnabled: true,
+			repeatStart: Math.min(prevState.repeatStart, prevState.position),
+			repeatEnd: prevState.position
+		}));
+	}
+
+	onRepeatClear() {
+		this.setState({
+			repeatStart: 0,
+			repeatEnd: 0,
+			repeatEnabled: false
+		});
+	}
+
 	onOpen() {
 		const input = document.createElement("input");
 		input.setAttribute("type", "file");
@@ -450,7 +477,7 @@ class App extends React.Component {
 
 				<div className="bottomContent">
 					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} midiOnNotes={this.state.midiOnNotes} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}/>
-					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing}/>
+					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing} onRepeatStart={this.onRepeatStart} onRepeatEnd={this.onRepeatEnd} onRepeatClear={this.onRepeatClear}/>
 				</div>
 			</div>
 		);
