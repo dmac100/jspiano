@@ -10,14 +10,14 @@ test('gets measures and notes', () => {
 	expect(parsed.measures[35]).toEqual({
 		index: 35,
 		beats: 12,
-		startTime: 25200,
-		endTime: 25920
+		startTimeDivisions: 25200,
+		endTimeDivisions: 25920
 	});
 
 	expect(parsed.notes.length).toBe(1283);
 
 	expect(parsed.notes[parsed.notes.length - 1]).toEqual({
-		duration: 360,
+		durationDivisions: 360,
 		part: {
 			index: 1,
 			partAbbreviation: "Pno.",
@@ -28,8 +28,8 @@ test('gets measures and notes', () => {
 		pitch: {
 			midiNumber: 46
 		},
-		wholeNoteStartTime: 53.25,
-		startTime: 25560
+		startTimeWholeNotes: 53.25,
+		startTimeDivisions: 25560
 	});
 
 	expect(parsed.length).toBe(25920);

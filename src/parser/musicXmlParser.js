@@ -21,10 +21,10 @@ class MusicXmlParser {
 		$(xml).find("part").each((_, part) => {
 			const partId = $(part).attr("id");
 
-			let wholeNoteStartTime = 0;
-			let prevWholeNoteStartTime = 0;
-			let startTime = 0;
-			let prevStartTime = 0;
+			let startTimeWholeNotes = 0;
+			let prevStartTimeWholeNotes = 0;
+			let startTimeDivisions = 0;
+			let prevStartTimeDivisions = 0;
 			let tied = false;
 			let beats = 4;
 			let divisions = 120;
@@ -32,7 +32,7 @@ class MusicXmlParser {
 			measures = [];
 
 			$(part).find("measure").each((measureIndex, measure) => {
-				measures.push({index: measureIndex, startTime: startTime, beats: beats});
+				measures.push({index: measureIndex, startTimeDivisions: startTimeDivisions, beats: beats});
 
 				$(measure).children().each((childIndex, child) => {
 					if(child.tagName === 'attributes') {
@@ -46,41 +46,41 @@ class MusicXmlParser {
 							divisions = attributeDivisions;
 						}
 					} if(child.tagName === 'note') {
-						const duration = +$(child).children("duration").text();
+						const durationDivisions = +$(child).children("duration").text();
 
 						const pitch = $(child).find("pitch");
 
 						const chord = $(child).find("chord");
 
 						if(chord.length > 0) {
-							startTime = prevStartTime;
-							wholeNoteStartTime = prevWholeNoteStartTime;
+							startTimeDivisions = prevStartTimeDivisions;
+							startTimeWholeNotes = prevStartTimeWholeNotes;
 						}
 
-						if(pitch.length > 0 && duration > 0) {
+						if(pitch.length > 0 && durationDivisions > 0) {
 							const step = $(pitch).find("step").text().trim();
 							const alter = $(pitch).find("alter").text().trim();
 							const octave = $(pitch).find("octave").text().trim();
 
 							if(tied) {
-								notes[notes.length - 1].duration += duration;
+								notes[notes.length - 1].durationDivisions += durationDivisions;
 							} else {
 								notes.push({
 									pitch: new Pitch(step + octave).transpose(+alter),
-									wholeNoteStartTime: wholeNoteStartTime,
-									startTime: startTime,
-									duration: duration,
+									startTimeWholeNotes,
+									startTimeDivisions,
+									durationDivisions,
 									part: scoreParts.get(partId),
 									measure: measureIndex
 								});
 							}
 						}
 
-						prevStartTime = startTime;
-						startTime += duration;
+						prevStartTimeDivisions = startTimeDivisions;
+						startTimeDivisions += durationDivisions;
 
-						prevWholeNoteStartTime = wholeNoteStartTime;
-						wholeNoteStartTime += (duration / divisions) / 4;
+						prevStartTimeWholeNotes = startTimeWholeNotes;
+						startTimeWholeNotes += (durationDivisions / divisions) / 4;
 
 						const tie = $(child).find("tie");
 						if(tie.length > 0) {
@@ -92,22 +92,22 @@ class MusicXmlParser {
 							}
 						}
 					} else if(child.tagName === 'backup') {
-						const duration = +$(child).children("duration").text();
-						startTime -= duration;
-						wholeNoteStartTime -= (duration / divisions) / 4;
+						const durationDivisions = +$(child).children("duration").text();
+						startTimeDivisions -= durationDivisions;
+						startTimeWholeNotes -= (durationDivisions / divisions) / 4;
 					} else if(child.tagName === 'forward') {
-						const duration = +$(child).children("duration").text();
-						startTime += duration;
-						wholeNoteStartTime += (duration / divisions) / 4;
+						const durationDivisions = +$(child).children("duration").text();
+						startTimeDivisions += durationDivisions;
+						startTimeWholeNotes += (durationDivisions / divisions) / 4;
 
 					}
 				});
 
-				measures[measures.length - 1].endTime = startTime;
+				measures[measures.length - 1].endTimeDivisions = startTimeDivisions;
 			});
 		});
 
-		const length = notes.reduce((max, note) => Math.max(max, note.startTime + note.duration), 0)
+		const length = notes.reduce((max, note) => Math.max(max, note.startTimeDivisions + note.durationDivisions), 0)
 
 		return { notes, measures, length, xml: musicXml };
 	}

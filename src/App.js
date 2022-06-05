@@ -21,7 +21,7 @@ function getPlayingNotes(musicXml, tracks, position) {
 	return musicXml.notes.filter(note => {
 		if(!activeTracks.has(note.part.partId)) return false;
 
-		return (note.startTime <= position && note.startTime + note.duration > position);
+		return (note.startTimeDivisions <= position && note.startTimeDivisions + note.durationDivisions > position);
 	});
 }
 
@@ -31,7 +31,7 @@ function getWaitingNotes(musicXml, tracks, prevPosition, position) {
 	const waitingNotes = musicXml.notes.filter(note => {
 		if(!waitingTracks.has(note.part.partId)) return false;
 
-		return (note.startTime > prevPosition && note.startTime <= position);
+		return (note.startTimeDivisions > prevPosition && note.startTimeDivisions <= position);
 	});
 
 	return _.uniq(waitingNotes, false, note => note.pitch.getMidiNumber());
@@ -142,7 +142,7 @@ class App extends React.Component {
 			if(waitingTracks.has(note.part.partId)) return false;
 			if(!activeTracks.has(note.part.partId)) return false;
 
-			return (note.startTime > prevPosition && note.startTime <= position);
+			return (note.startTimeDivisions > prevPosition && note.startTimeDivisions <= position);
 		});
 
 		notes = _.uniq(notes, false, note => note.pitch.getMidiNumber());
@@ -155,7 +155,7 @@ class App extends React.Component {
 	playNotesAtPosition(musicXml, position) {
 		// Play notes that begin at position
 		let notes = musicXml.notes.filter(note => {
-			return (note.startTime >= position - 1 && note.startTime <= position + 1);
+			return (note.startTimeDivisions >= position - 1 && note.startTimeDivisions <= position + 1);
 		});
 
 		notes = _.uniq(notes, false, note => note.pitch.getMidiNumber());
@@ -293,15 +293,15 @@ class App extends React.Component {
 			for(let note of this.state.musicXml.notes) {
 				if(activeTracks.has(note.part.partId)) {
 					if(event.keyCode === ARROW_UP) {
-						if(note.startTime > this.state.position) {
-							if(!position || note.startTime < position) {
-								position = note.startTime;
+						if(note.startTimeDivisions > this.state.position) {
+							if(!position || note.startTimeDivisions < position) {
+								position = note.startTimeDivisions;
 							}
 						}
 					} else if(event.keyCode === ARROW_DOWN) {
-						if(note.startTime < this.state.position) {
-							if(!position || note.startTime > position) {
-								position = note.startTime;
+						if(note.startTimeDivisions < this.state.position) {
+							if(!position || note.startTimeDivisions > position) {
+								position = note.startTimeDivisions;
 							}
 						}
 					}
@@ -318,15 +318,15 @@ class App extends React.Component {
 			let position = null;
 			for(let measure of this.state.musicXml.measures) {
 				if(event.keyCode === ARROW_LEFT) {
-					if(measure.startTime < this.state.position) {
-						if(!position || measure.startTime > position) {
-							position = measure.startTime;
+					if(measure.startTimeDivisions < this.state.position) {
+						if(!position || measure.startTimeDivisions > position) {
+							position = measure.startTimeDivisions;
 						}
 					}
 				} else if(event.keyCode === ARROW_RIGHT) {
-					if(measure.startTime > this.state.position + 1) {
-						if(!position || measure.startTime < position) {
-							position = measure.startTime;
+					if(measure.startTimeDivisions > this.state.position + 1) {
+						if(!position || measure.startTimeDivisions < position) {
+							position = measure.startTimeDivisions;
 						}
 					}
 				}

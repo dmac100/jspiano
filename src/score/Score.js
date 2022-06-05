@@ -134,8 +134,8 @@ const Score = props => {
 			const nearestNote = osmd.graphic.GetNearestNote({x, y}, 5);
 			if(nearestNote) {
 				const wholeNotes = nearestNote.sourceNote.getAbsoluteTimestamp().realValue;
-				const note = _.min(props.musicXml.notes, note => Math.abs(wholeNotes - note.wholeNoteStartTime));
-				props.onScroll(note.startTime);
+				const note = _.min(props.musicXml.notes, note => Math.abs(wholeNotes - note.startTimeWholeNotes));
+				props.onScroll(note.startTimeDivisions);
 			}
 		}
 	}
@@ -145,10 +145,10 @@ const Score = props => {
 			return 0;
 		}
 
-		const notes = _.sortBy(props.musicXml.notes, note => -note.startTime);
+		const notes = _.sortBy(props.musicXml.notes, note => -note.startTimeDivisions);
 		for(let note of notes) {
-			if(note.startTime <= position + 1) {
-				return note.wholeNoteStartTime;
+			if(note.startTimeDivisions <= position + 1) {
+				return note.startTimeWholeNotes;
 			}
 		}
 		return -1;

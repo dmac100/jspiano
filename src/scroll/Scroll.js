@@ -15,8 +15,8 @@ const keyWidth = 12;
 const leftMargin = 10;
 
 function getNoteTop(totalHeight, note, scale) {
-	const startTime = note.startTime * scale;
-	const duration = note.duration * scale;
+	const startTime = note.startTimeDivisions * scale;
+	const duration = note.durationDivisions * scale;
 	
 	return totalHeight - startTime - duration;
 }
@@ -125,8 +125,8 @@ const Scroll = props => {
 		if(props.musicXml) {
 			// Draw the barlines.
 			props.musicXml.measures.forEach(measure => {
-				const measureStartY = totalHeight - (measure.startTime * scale);
-				const measureEndY = totalHeight - (measure.endTime * scale);
+				const measureStartY = totalHeight - (measure.startTimeDivisions * scale);
+				const measureEndY = totalHeight - (measure.endTimeDivisions * scale);
 
 				for(let i = 0; i < measure.beats; i++) {
 					const measureY = measureStartY + (measureEndY - measureStartY) * (i / measure.beats);
@@ -147,7 +147,7 @@ const Scroll = props => {
 			props.musicXml.notes.forEach(note => {
 				if(activeTracks.has(note.part.partId)) {
 					const pitch = note.pitch.getMidiNumber();
-					const duration = note.duration * scale;
+					const duration = note.durationDivisions * scale;
 
 					const y = getNoteTop(totalHeight, note, scale);
 
