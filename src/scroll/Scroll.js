@@ -3,14 +3,6 @@ import * as d3 from 'd3';
 import './Scroll.css';
 import getNoteColor from '../model/colors.js';
 
-function usePrevious(value) {
-	const ref = React.useRef();
-	React.useEffect(() => {
-		ref.current = value;
-	}, [value]);
-	return ref.current;
-}
-
 const keyWidth = 12;
 const leftMargin = 10;
 
@@ -69,8 +61,6 @@ const Scroll = props => {
 	const scrollRef = React.createRef();
 	const svgRef = React.createRef();
 
-	const prevProps = usePrevious(props);
-
 	const scale = (props.scale / 10) + 0.1;
 	const totalHeight = props.musicXml ? (props.musicXml.length * scale) + 1000 : 2000;
 
@@ -79,11 +69,11 @@ const Scroll = props => {
 	React.useEffect(() => {
 		scrollRef.current.scrollTop = (totalHeight / scale - props.position) * scale - scrollRef.current.clientHeight;
 		onScrollDisabledTimer.disableOnScroll();
-
-		if(!prevProps || props.musicXml !== prevProps.musicXml || props.tracks !== prevProps.tracks || props.scale !== prevProps.scale) {
-			renderSvg();
-		}
 	});
+
+	React.useEffect(() => {
+		renderSvg();
+	}, [props.musicXml, props.tracks, props.scale]);
 
 	function onScroll() {
 		if(!onScrollDisabledTimer.isOnScrollDisabled()) {
