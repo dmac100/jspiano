@@ -439,11 +439,29 @@ class App extends React.Component {
 		let scroll = <div/>;
 
 		if(this.state.showScore) {
-			score = (<Score tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} repeatEnabled={this.state.repeatEnabled} repeatStart={this.state.repeatStart} repeatEnd={this.state.repeatEnd}/>);
+			score = (
+				<Score
+					tracks={this.state.tracks}
+					position={this.state.position}
+					onScroll={this.onPositionChanged}
+					musicXml={this.state.musicXml}
+					repeatEnabled={this.state.repeatEnabled}
+					repeatStart={this.state.repeatStart}
+					repeatEnd={this.state.repeatEnd}
+				/>
+			);
 		}
 
 		if(this.state.showScroll) {
-			scroll = (<Scroll tracks={this.state.tracks} position={this.state.position} onScroll={this.onPositionChanged} musicXml={this.state.musicXml} scale={this.state.scale}/>);
+			scroll = (
+				<Scroll
+					tracks={this.state.tracks}
+					position={this.state.position}
+					onScroll={this.onPositionChanged}
+					musicXml={this.state.musicXml}
+					scale={this.state.scale}
+				/>
+			);
 		}
 
 		if(this.state.showScore && this.state.showScroll) {
@@ -469,15 +487,39 @@ class App extends React.Component {
 			<div className="App" onKeyDown={this.onKeyDown} tabIndex="0">
 				<div className="topContent">
 					<Tracks tracks={this.state.tracks} onChange={this.onTrackChange}/>
-					<TopButtons onOpen={this.onOpen} showScroll={this.state.showScroll} showScore={this.state.showScore} onToggleShowScore={this.onToggleShowScore} onToggleShowScroll={this.onToggleShowScroll}/>
-					<Sliders onTempoChange={this.onTempoChange} onScaleChange={this.onScaleChange} tempo={this.state.tempo} scale={this.state.scale}/>
+					<TopButtons
+						onOpen={this.onOpen}
+						showScroll={this.state.showScroll}
+						showScore={this.state.showScore}
+						onToggleShowScore={this.onToggleShowScore}
+						onToggleShowScroll={this.onToggleShowScroll}
+					/>
+					<Sliders
+						onTempoChange={this.onTempoChange}
+						onScaleChange={this.onScaleChange}
+						tempo={this.state.tempo}
+						scale={this.state.scale}
+					/>
 				</div>
 
 				{middleContent}
 
 				<div className="bottomContent">
-					<Keyboard tracks={this.state.tracks} playingNotes={this.state.playingNotes} waitingNotes={this.state.waitingNotes} midiOnNotes={this.state.midiOnNotes} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}/>
-					<BottomButtons onPlay={this.togglePlay} playing={this.state.playing} onRepeatStart={this.onRepeatStart} onRepeatEnd={this.onRepeatEnd} onRepeatClear={this.onRepeatClear}/>
+					<Keyboard
+						tracks={this.state.tracks}
+						playingNotes={this.state.playingNotes}
+						waitingNotes={this.state.waitingNotes}
+						midiOnNotes={this.state.midiOnNotes}
+						onMouseDown={this.onMouseDown}
+						onMouseUp={this.onMouseUp}
+					/>
+					<BottomButtons
+						onPlay={this.togglePlay}
+						playing={this.state.playing}
+						onRepeatStart={this.onRepeatStart}
+						onRepeatEnd={this.onRepeatEnd}
+						onRepeatClear={this.onRepeatClear}
+					/>
 				</div>
 			</div>
 		);
