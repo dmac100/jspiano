@@ -1,5 +1,4 @@
 import React from 'react';
-import * as d3 from 'd3';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import MidiSetup from './MidiSetup.js';

@@ -52,7 +52,7 @@ class OnScrollDisabledTimer {
 	}
 
 	disableOnScroll() {
-		if(this.timer != 0) {
+		if(this.timer !== 0) {
 			clearTimeout(this.timer);
 		}
 
@@ -96,7 +96,6 @@ const Scroll = props => {
 
 		d3.select(svg).selectAll("*").remove();
 
-		const white = '#fff';
 		const black = '#000';
 		const grey220 = 'rgb(220,220,220)';
 		const grey240 = 'rgb(240,240,240)';

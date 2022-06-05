@@ -32,19 +32,19 @@ const Keyboard = (props) => {
 	React.useEffect(() => renderSvg());
 
 	function getSelectedColor(pitch, activeTracks) {
-		for(var note of props.midiOnNotes) {
+		for(let note of props.midiOnNotes) {
 			if(note === pitch.getMidiNumber()) {
 				return '#e33';
 			}
 		}
 
-		for(var note of props.waitingNotes) {
+		for(let note of props.waitingNotes) {
 			if(note.pitch.equals(pitch)) {
 				return '#e33';
 			}
 		}
 
-		for(var note of props.playingNotes) {
+		for(let note of props.playingNotes) {
 			if(note.pitch.equals(pitch) && activeTracks.has(note.part.partId)) {
 				return getNoteColor(note);
 			}
@@ -162,7 +162,6 @@ const Keyboard = (props) => {
 		const white = '#fff';
 		const black = '#000';
 		const grey30 = 'rgb(30,30,30)';
-		const grey50 = 'rgb(50,50,50)';
 		const grey80 = 'rgb(80,80,80)';
 		const grey120 = 'rgb(120,120,120)';
 
