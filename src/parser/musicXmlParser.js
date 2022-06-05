@@ -57,7 +57,7 @@ class MusicXmlParser {
 							wholeNoteStartTime = prevWholeNoteStartTime;
 						}
 
-						if(pitch.length > 0) {
+						if(pitch.length > 0 && duration > 0) {
 							const step = $(pitch).find("step").text().trim();
 							const alter = $(pitch).find("alter").text().trim();
 							const octave = $(pitch).find("octave").text().trim();
