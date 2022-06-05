@@ -177,9 +177,9 @@ class App extends React.Component {
 		if(this.state.waitingNotes.length === 0) {
 			this.setState(prevState => {
 				let newPosition = Math.round(prevState.position + (amount * tempo));
-				let newMinWaitingPosition = (newPosition < prevState.minWaitingPosition - 5) ? newPosition : Math.max(prevState.minWaitingPosition, newPosition);
-				let jumpBack = false;
+				let newMinWaitingPosition = newPosition;
 
+				let jumpBack = false;
 				if(prevState.repeatEnabled) {
 					if(newPosition > prevState.repeatEnd) {
 						newPosition = prevState.repeatStart;
