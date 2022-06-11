@@ -172,7 +172,7 @@ class App extends React.Component {
 
 		const tempo = this.state.tempo / 50;
 
-		this.playNotes(this.state.musicXml, this.state.position, this.state.position + (amount * tempo));
+		this.playNotes(this.state.musicXml, this.state.position, Math.round(this.state.position + (amount * tempo)));
 
 		if(this.state.waitingNotes.length === 0) {
 			this.setState(prevState => {
