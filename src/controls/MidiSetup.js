@@ -17,6 +17,8 @@ WebMidi.enable().then(function() {
 
 	if(midiInputs.length > 0) {
 		midiInput = midiInputs[midiInputs.length - 1];
+		midiInput.addListener("noteon", e => onNoteOn(new Pitch(e.note.number)));
+		midiInput.addListener("noteoff", e => onNoteOff(new Pitch(e.note.number)));
 	}
 	if(midiOutputs.length > 0) {
 		midiOutput = midiOutputs[midiOutputs.length - 1];
